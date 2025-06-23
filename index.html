@@ -27,6 +27,24 @@
     #level-fill { width: 0%; height: 100%; background: #4CAF50; transition: width .2s; }
     button, #fruit-btn { outline: none !important; -webkit-tap-highlight-color: transparent; border: none; background: none; }
     #fruit-btn { cursor: pointer; display: block; margin: 0 auto; touch-action: manipulation; position: relative;}
+#tap-zone {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#tap-zone:focus {
+  outline: none !important;
+}
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  touch-action: manipulation;
+}
     #fruit-btn img { width: 6rem; transition: transform .1s; }
     #fruit-btn:active img { transform: scale(1.2); }
     #gold-bar { background: #d99d3b; border: 4px solid #fff; border-radius: 12px; padding: .5rem 1rem; margin: .75rem 0; display: inline-flex; align-items: center; justify-content: center; min-width: 100px; font-size: 1.25rem; color: #fff; }
@@ -37,27 +55,734 @@
     #achiev-list, #leaders { list-style: decimal inside; color: #333; padding-left: 1rem; }
     .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff; padding: .75rem 1.5rem; border-radius: 8px; font-size: 1rem; opacity: 0; animation: toastInOut 3s forwards; }
     @keyframes toastInOut { 0% { opacity: 0; transform: translateX(-50%) translateY(-20px); } 10% { opacity: 1; transform: translateX(-50%) translateY(0); } 90% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
-    .floating-text { position: absolute; font-size: 1.5rem; color: #FFD700; animation: floatUp 0.8s ease-out forwards; pointer-events: none; user-select: none; }
-    @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -50px); } }
-  </style>
+    .floating-text {
+  position: absolute;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #FFD700;
+  text-shadow:
+    -2px -2px 0 #000,  
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    0 0 10px #fff,
+    0 2px 12px #FFD700;
+  animation: floatUp 0.8s cubic-bezier(.25,1.5,.5,1) forwards, popScale 0.3s cubic-bezier(.18,.89,.32,1.28);
+  pointer-events: none;
+  user-select: none;
+  z-index: 9999;
+}
+    @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0); }
+@keyframes popScale {
+  0% { transform: translate(-50%, 0) scale(1); }
+  50% { transform: translate(-50%, -10px) scale(1.5); }
+  100% { transform: translate(-50%, -20px) scale(1.1); }
+}
+ 100% { opacity: 0; transform: translate(-50%, -50px); } }
+  
+/* Apple pop effect */
+#fruit-btn.pop img { animation: applePop 0.24s cubic-bezier(.2,1.4,.6,1) 1; }
+@keyframes applePop {
+  0% { transform: scale(1); }
+  60% { transform: scale(1.3) rotate(-8deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+/* Ripple effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(135,206,235,0.5);
+  pointer-events: none;
+  transform: scale(0);
+  animation: rippleAnim 0.5s linear;
+  z-index: 9000;
+}
+@keyframes rippleAnim {
+  to { transform: scale(3); opacity: 0; }
+}
+/* Confetti pop */
+.confetti {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  z-index: 9999;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: confettiPop 0.7s cubic-bezier(.19,1.3,.6,1);
+}
+@keyframes confettiPop {
+  0% { transform: scale(0.5); opacity:1; }
+  80% { opacity:1;}
+  100% { transform: translate(var(--x), var(--y)) scale(1); opacity: 0; }
+}
+/* Tap zone flash */
+#tap-zone.flash { animation: tapFlash 0.14s; }
+@keyframes tapFlash {
+  0% { background: rgba(255,255,255,0.4); }
+  100% { background: transparent; }
+}
+
+
+.fly-coin {
+  position: fixed;
+  width: 28px; height: 28px;
+  background: radial-gradient(ellipse at 60% 40%, #ffd700 90%, #ffcc00 100%);
+  border-radius: 50%;
+  box-shadow: 0 1px 6px #aaa;
+  pointer-events: none;
+  z-index: 99999;
+  animation: flyCoin 0.8s cubic-bezier(.32,1.52,.44,.96) forwards;
+  opacity: 0.95;
+  border: 2px solid #fff6b2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #fff4a0;
+  text-shadow: 0 0 6px #996e00;
+}
+@keyframes flyCoin {
+  0% { opacity: 0.6; transform: scale(1) translate(0,0); }
+  70% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.2) translate(var(--tx, 0px), var(--ty, 0px)); }
+}
+
+
+.big-confetti {
+  position: fixed;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 100000;
+}
+.celebration-dot {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: dropConfetti 1.4s cubic-bezier(.2,1.3,.5,1);
+}
+@keyframes dropConfetti {
+  0% { transform: translateY(-60px) scale(1.3) rotate(0deg); opacity: 0.6;}
+  80% { opacity: 1;}
+  100% { transform: translateY(95vh) scale(1) rotate(360deg); opacity: 0; }
+}
+
+
+#golden-fruit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 50;
+  pointer-events: auto;
+  display: none;
+  transition: filter .1s, transform .2s;
+}
+#golden-fruit img {
+  width: 5.3rem;
+  filter: drop-shadow(0 0 22px #ffd700);
+  transition: filter .12s, transform .1s;
+}
+#golden-fruit.active { display: block; animation: goldfruitpulse 0.8s alternate infinite; }
+@keyframes goldfruitpulse {
+  0% { transform: translate(-50%, -50%) scale(1.08) rotate(-7deg); }
+  100% { transform: translate(-50%, -48%) scale(1.16) rotate(7deg); }
+}
+
+
+.bg-clouds {
+  position: fixed;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cloud {
+  position: absolute;
+  top: 0;
+  width: 120px; height: 60px;
+  opacity: 0.75;
+  will-change: transform;
+  pointer-events: none;
+  filter: blur(0.4px) brightness(1.08);
+  transition: opacity .4s;
+}
+.cloud.c2 { width: 170px; height: 80px; opacity: 0.62; filter: blur(0.8px) brightness(1.1); }
+.cloud.c3 { width: 90px; height: 45px; opacity: 0.58; filter: blur(0.7px) brightness(0.92); }
+.cloud.c4 { width: 200px; height: 100px; opacity: 0.45; filter: blur(1.2px) brightness(1.17); }
+
+
+/* Apple tap wiggle/squash */
+#fruit-btn.wiggle img {
+  animation: appleWiggle .19s cubic-bezier(.33,1.7,.63,1.3) 1;
+}
+@keyframes appleWiggle {
+  0% { transform: scale(1,1) rotate(0deg); }
+  20% { transform: scale(1.25,0.85) rotate(-7deg); }
+  50% { transform: scale(0.94,1.14) rotate(5deg); }
+  80% { transform: scale(1.1,0.92) rotate(-2deg); }
+  100% { transform: scale(1,1) rotate(0deg); }
+}
+
+
+.upgrade-icon {
+  display: inline-block;
+  font-size: 2rem;
+  margin-right: 8px;
+  vertical-align: middle;
+  transition: transform .17s cubic-bezier(.33,1.5,.33,1.4);
+}
+.upgrade-btn.bounce .upgrade-icon {
+  animation: iconBounce .25s cubic-bezier(.33,1.5,.33,1.4);
+}
+@keyframes iconBounce {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.22,0.91) rotate(-10deg); }
+  60% { transform: scale(0.96,1.1) rotate(7deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.count-badge {
+  display: inline-block;
+  background: #ffd700;
+  color: #253620;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 2px 9px;
+  margin-left: 4px;
+  font-size: 1.08rem;
+  min-width: 24px;
+  text-align: center;
+  vertical-align: middle;
+  box-shadow: 0 1px 3px #ceb32b2b;
+  border: 1.5px solid #fffbe6;
+}
+
+
+#facts-modal-bg {
+  display: none;
+  position: fixed; left:0; top:0; width:100vw; height:100vh;
+  background:rgba(0,0,0,0.24); z-index:3600;
+}
+#facts-modal {
+  position: fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  background: #fffbea;
+  color: #2c2200;
+  border-radius: 17px;
+  box-shadow: 0 6px 32px #8886;
+  padding: 25px 18px 20px 18px;
+  min-width: 290px; max-width:96vw; max-height:84vh;
+  z-index:3700;
+  display: flex; flex-direction: column; gap:13px;
+  opacity: 0; animation: modalIn 0.22s forwards;
+  overflow-y:auto;
+}
+#facts-modal h2 { font-size:1.2rem; margin:0 0 6px 0; }
+#facts-modal ul { padding-left:1.2em; margin:0; font-size:1.06rem;}
+#facts-modal .close-btn {
+  position: absolute; top: 8px; right: 12px; font-size: 1.3rem; background: none; border: none; color: #888; cursor: pointer;
+}
+.fruit-toast-fact {
+  background: #ffe47c;
+  color: #533d00;
+  border-radius: 1em;
+  padding: 6px 16px;
+  font-size: 1.06em;
+  box-shadow: 0 2px 14px #ffc9002b;
+  font-weight: 500;
+  margin-bottom: 7px;
+}
+
+
+#tree-grow-container { width: 120px; height: 160px; margin: 0 auto 0.6em auto; pointer-events: none; }
+#tree-grow-container svg { width: 100%; height: 100%; }
+@media (max-width: 440px) {
+  #tree-grow-container { width: 78px; height: 90px; margin-bottom: 0.3em; }
+}
+
+
+/* Extra big fruit wiggle for level-up */
+#fruit-btn.big-wiggle img {
+  animation: fruitLevelUp .37s cubic-bezier(.33,1.7,.63,1.3) 1;
+}
+@keyframes fruitLevelUp {
+  0% { transform: scale(1,1) rotate(0deg); }
+  17% { transform: scale(1.38,0.80) rotate(-12deg); }
+  40% { transform: scale(0.92,1.21) rotate(7deg); }
+  65% { transform: scale(1.12,0.93) rotate(-6deg); }
+  100% { transform: scale(1,1) rotate(0deg); }
+}
+
+
+/* Combo +X styles */
+.plus-float.combo5 { color: #298cff; font-size: 2.2em; text-shadow: 0 0 5px #70aaff77; }
+.plus-float.combo10 { color: #ffd600; font-size: 2.7em; text-shadow: 0 0 11px #fffbcf; font-weight:900;}
+.plus-float.combo15 { color: #ff35c5; background: linear-gradient(90deg,#ffd600,#35ff7c,#ff35c5); background-clip: text; -webkit-background-clip: text; color: transparent; font-size: 3.0em; text-shadow: 0 0 12px #ffe0fd,0 0 2px #fff; }
+
+
+/* Coin bar flash effect */
+#gold-bar.flash { animation: goldFlash .5s; }
+@keyframes goldFlash {
+  0% { box-shadow: 0 0 0 #fff9bb; background: #ffe78a; }
+  27% { box-shadow: 0 0 22px #fffbb9; background: #fff5c4; }
+  60% { box-shadow: 0 0 16px #ffefb0; background: #fff5c4; }
+  100% { box-shadow: none; background: none; }
+}
+
+
+/* Upgrade button "afford" pulse */
+.upgrade-btn.pulse {
+  animation: affordPulse 0.75s infinite alternate;
+  box-shadow: 0 0 0 0 #ffd70080, 0 2px 10px #fff7c055;
+  border-color: #ffd700 !important;
+}
+@keyframes affordPulse {
+  from { transform: scale(1); box-shadow: 0 0 0 0 #ffd70080; }
+  to { transform: scale(1.065); box-shadow: 0 0 16px 4px #ffd70050; }
+}
+
+
+#first-tap-popover {
+  position: absolute;
+  left: 50%;
+  top: 65%;
+  transform: translate(-50%, -120%);
+  background: #fffbe7;
+  color: #683800;
+  border-radius: 17px;
+  box-shadow: 0 3px 15px #e7c75744;
+  font-size: 1.09em;
+  padding: 13px 26px;
+  z-index: 1500;
+  font-weight: 600;
+  animation: popIn .42s cubic-bezier(.41,2,.55,1);
+  border: 2px solid #ffe298;
+  pointer-events: none;
+  display: none;
+  opacity: 0;
+  transition: opacity .25s;
+}
+#first-tap-popover.active {
+  display: block;
+  opacity: 1;
+}
+@keyframes popIn {
+  0% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+  100% { opacity: 1; transform: translate(-50%, -120%) scale(1); }
+}
+
+
+/* Tap scale animation */
+@keyframes tapScale {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+#fruit-btn.tap-animating {
+  animation: tapScale 0.2s ease;
+}
+
+/* Particle canvas styling */
+#particle-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Upgrade button glow pulse animation */
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0px rgba(255,215,0,0.9); }
+  50% { box-shadow: 0 0 10px rgba(255,215,0,0.9); }
+  100% { box-shadow: 0 0 0px rgba(255,215,0,0.9); }
+}
+.upgrade-effect {
+  animation: glowPulse 0.5s ease;
+}
+
+/* Upgrade button scale bounce animation */
+@keyframes scaleBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.scale-effect {
+  animation: scaleBounce 0.3s ease;
+}
+
+/* Super upgrade effect: scale + rotate */
+@keyframes superBounce {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.super-upgrade {
+  animation: superBounce 0.6s ease-out;
+}
+
+/* Upgrade button highlight and shake effect */
+#upgrade-btn, #auto-btn, #tree-btn, #orchard-btn, #farmhand-btn {
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.upgrade-highlight {
+  box-shadow: 0 0 15px 3px gold;
+}
+@keyframes btnShake {
+  0% { transform: translate(0,0) rotate(0); }
+  20% { transform: translate(-5px,5px) rotate(-5deg); }
+  40% { transform: translate(5px,-5px) rotate(5deg); }
+  60% { transform: translate(-5px,5px) rotate(-3deg); }
+  80% { transform: translate(5px,-5px) rotate(3deg); }
+  100% { transform: translate(0,0) rotate(0); }
+}
+.shake-btn {
+  animation: btnShake 0.5s ease;
+}
+</style>
+<style>
+/* Toast notification for upgrades */
+@keyframes toastAnim {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  50% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -40px); }
+}
+#upgrade-toast {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 215, 0, 0.9);
+  color: #222;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 1001;
+  animation: toastAnim 1s ease-out;
+}
+/* Optional screen shake */
+@keyframes screenShake {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-5px, 5px); }
+  40% { transform: translate(5px, -5px); }
+  60% { transform: translate(-5px, 5px); }
+  80% { transform: translate(5px, -5px); }
+  100% { transform: translate(0, 0); }
+}
+.shake {
+  animation: screenShake 0.4s ease-in-out;
+}
+</style>
+
+
+<style>
+/* Tutorial overlay styles */
+#tutorial-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  z-index: 2000;
+}
+#tutorial-popup {
+  position: absolute;
+  background: #fff;
+  color: #000;
+  padding: 16px;
+  border-radius: 8px;
+  max-width: 240px;
+  z-index: 2001;
+}
+#tutorial-popup button {
+  margin-top: 8px;
+  margin-right: 8px;
+}
+.highlight-element {
+  position: relative;
+  z-index: 2002;
+  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.9);
+}
+</style>
+
+<style>
+/* Themes & Skins CSS */
+.dark-mode { background: #222 !important; color: #eee !important; }
+.dark-mode .container { background: #333 !important; }
+.dark-mode #fruit-btn img { filter: brightness(0.8) contrast(1.2); }
+.neon-mode { background: #000 !important; color: #0f0 !important; }
+.neon-mode .container { background: #111 !important; }
+.neon-mode #fruit-btn img { filter: hue-rotate(200deg) saturate(3); }
+.theme-btn { padding: 8px 14px; border:none; border-radius:6px; cursor:pointer; background:#6e3baa; color:#fff; }
+.theme-btn:disabled { background:#888; cursor:not-allowed; }
+</style>
+
+<style>
+/* Daily Reward Toast */
+#daily-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffd700;
+  color: #000;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  display: none;
+  z-index: 1001;
+}
+#daily-toast.show {
+  display: block;
+  animation: fadeInOut 4s ease-out forwards;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+</style>
+
+
+<style>
+/* Offline Reward Toast */
+#idle-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4caf50;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  display: none;
+  z-index: 1001;
+}
+#idle-toast.show {
+  display: block;
+  animation: fadeInOut 4s ease-out forwards;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+</style>
+
+
+<style>
+/* Additional Themes */
+.forest-mode { background: #e8ffe8 !important; color: #055005 !important; }
+.forest-mode .container { background: #ccffcc !important; }
+.forest-mode #fruit-btn img { filter: hue-rotate(90deg) saturate(1.5); }
+.sunset-mode { background: #ffefd5 !important; color: #5b0000 !important; }
+.sunset-mode .container { background: #ffe4b5 !important; }
+.sunset-mode #fruit-btn img { filter: hue-rotate(-30deg) brightness(1.2); }
+</style>
+
+<style>
+#theme-shop .theme-btn {
+  max-width: 300px;
+  margin: 0 auto;
+}
+</style>
+
+<style>
+/* Enhanced Daily Login Rewards Toast */
+#daily-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #ff9800;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  display: none;
+  z-index: 2001;
+}
+#daily-toast.show {
+  display: block;
+  animation: fadeInOut 4s ease-out forwards;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+</style>
+
+<style>
+/* Offline Earnings Modal */
+#idle-overlay {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none; z-index: 2000;
+}
+#idle-modal {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff; padding: 20px;
+  border-radius: 8px; z-index: 2001;
+  max-width: 90vw; box-sizing: border-box;
+  display: none;
+}
+#idle-modal p {
+  margin: 0 0 12px;
+  font-size: 1em;
+}
+#idle-modal button.close-idle {
+  padding: 6px 12px; border: none;
+  border-radius: 4px; background: #6e3baa;
+  color: #fff; cursor: pointer;
+}
+</style>
+
+
+<style>
+/* Screen Transitions for Tab Content */
+#game, #achievements, #leaderboard, #themes {
+  display: block !important;
+}
+.container-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+}
+.container-content.active {
+  max-height: 2000px;
+  opacity: 1;
+}
+</style>
+
+
+<style>
+/* Lottie-style fruit spin animation */
+@keyframes spinFruit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.lottie-fruit {
+  animation: spinFruit 4s linear infinite;
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+</style>
+
+<style>
+/* Hide coin elements when not on Play tab */
+.container-content:not(#game):not(.active) #coins,
+.container-content:not(#game):not(.active) #cps,
+.container-content:not(#game):not(.active) .coin-effect {
+  visibility: hidden !important;
+}
+</style>
+
+
+<style>
+/* Hide entire game container (coins, cps, upgrades) unless Play tab is active */
+#game { display: none !important; }
+#game.active { display: block !important; }
+</style>
+
+
+<style>
+</style>
+
+
+<style>
+#prestige-shop-modal .fly-coin,
+#prestige-shop-modal #gold-bar,
+#prestige-shop-modal #cps {
+  visibility: hidden !important;
+}
+</style>
+
+
+<style>
+#prestige-shop-modal .fly-coin,
+#prestige-shop-modal .coin-effect,
+#prestige-shop-modal .gold-bar,
+#prestige-shop-modal #gold-bar,
+#prestige-shop-modal #coins,
+#prestige-shop-modal #cps,
+#prestige-shop-modal .coin-icon,
+#prestige-shop-modal .coin-count,
+#prestige-shop-modal .upgrade-cost img {
+  display: none !important;
+  visibility: hidden !important;
+}
+</style>
+
+<style>
+/* Hide header coin UI and floating coins when Prestige Shop is open */
+body.prestige-open #gold-bar,
+body.prestige-open #cps,
+body.prestige-open .fly-coin {
+  visibility: hidden !important;
+  display: none !important;
+}
+</style>
+
 </head>
 <body>
+<!-- Prestige Shop Modal -->
+<div id="prestige-shop-modal" style="
+    display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;
+    background:rgba(24,12,48,0.55);z-index:10000;justify-content:center;align-items:center;">
+  <div style="background:#fff;border-radius:16px;max-width:330px;width:92vw;padding:18px 12px 10px 12px;box-shadow:0 4px 30px #0008;position:relative;display:flex;flex-direction:column;align-items:center;">
+    <h2 style="color:#6e3baa;font-weight:bold;margin:0 0 8px 0;font-size:1.4em;letter-spacing:0.01em;">🏆 Prestige Shop</h2>
+    <div id="prestige-shop-list" style="width:100%;margin:10px 0;"></div>
+    <button onclick="closePrestigeShop()" style="margin-top:16px;background:#eee;border:none;padding:8px 28px;font-size:1.08em;border-radius:14px;color:#222;font-weight:bold;">Close</button>
+  </div>
+</div>
+<div class="bg-clouds">
+  <svg class="cloud c1" id="cloud1" style="top:22vh; left:-140px;" width="120" height="60" viewBox="0 0 120 60"><ellipse cx="40" cy="40" rx="36" ry="20" fill="#fff" opacity="0.85"/><ellipse cx="74" cy="28" rx="29" ry="18" fill="#fff" opacity="0.73"/><ellipse cx="85" cy="44" rx="22" ry="14" fill="#fff" opacity="0.8"/></svg>
+  <svg class="cloud c2" id="cloud2" style="top:9vh; left:-240px;" width="170" height="80" viewBox="0 0 170 80"><ellipse cx="50" cy="55" rx="46" ry="23" fill="#fff" opacity="0.82"/><ellipse cx="105" cy="35" rx="37" ry="19" fill="#fff" opacity="0.74"/><ellipse cx="135" cy="62" rx="28" ry="13" fill="#fff" opacity="0.7"/></svg>
+  <svg class="cloud c3" id="cloud3" style="top:41vh; left:-100px;" width="90" height="45" viewBox="0 0 90 45"><ellipse cx="26" cy="25" rx="20" ry="11" fill="#fff" opacity="0.9"/><ellipse cx="58" cy="16" rx="18" ry="9" fill="#fff" opacity="0.74"/><ellipse cx="70" cy="28" rx="14" ry="7" fill="#fff" opacity="0.75"/></svg>
+  <svg class="cloud c4" id="cloud4" style="top:70vh; left:-220px;" width="200" height="100" viewBox="0 0 200 100"><ellipse cx="70" cy="80" rx="54" ry="25" fill="#fff" opacity="0.76"/><ellipse cx="150" cy="45" rx="38" ry="22" fill="#fff" opacity="0.69"/><ellipse cx="170" cy="82" rx="29" ry="15" fill="#fff" opacity="0.7"/></svg>
+</div>
+
   <audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop autoplay></audio>
   <div class="container">
-    <div id="title">Fruit T🍎pper</div>
+    <div id="title"><svg class="lottie-fruit" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="60" r="30" fill="#ff4d4d"/>
+  <path d="M50 30 C45 20, 60 20, 55 30 Z" fill="#228B22"/>
+</svg>Fruit T🍎pper</div>
     <button id="mute-btn">🔊</button><button id="reset-btn">🔄</button>
     <div id="tabs">
       <button id="tab-play" class="tab-btn active">Play</button>
       <button id="tab-achiev" class="tab-btn">Achievements</button>
       <button id="tab-leader" class="tab-btn">Leaderboard</button>
+      <button id="tab-themes" class="tab-btn">Themes</button>
     </div>
     <div id="game" class="active">
-      <div id="prestige-container">Prestige Count: <span id="prestige-count">0</span><br/><button id="prestige-btn" disabled>Prestige (Lv20+)</button></div>
-      <div id="level-container"><div id="level-text">Level: <span id="level">1</span></div><div id="level-bar"><div id="level-fill"></div></div></div>
-      <button id="fruit-btn"><img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f34e.png" alt="Apple"/></button>
-      <div id="gold-bar"><span id="coins">0</span>🟡</div>
+      <div id="prestige-container">Prestige Count: <span id="prestige-count">0</span><br/><button id="prestige-btn" disabled>Prestige (Lv20+)</button>
+<button id="prestige-shop-btn" style="margin-left:10px;padding:6px 12px;background:#ffd700;color:#000;border:none;border-radius:4px;cursor:pointer;;z-index:10001;pointer-events:auto">
+  Prestige Shop
+</button>
 
-      <button id="upgrade-btn" class="action-btn" data-req-level="1">
+</div>
+      <div id="level-container"><div id="level-text">Level: <span id="level">1</span></div><div id="level-bar"><div id="level-fill"></div></div></div>
+      <div id="tap-zone"><button id="fruit-btn"><img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f34e.png" alt="Apple"/></button><div id="golden-fruit"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f34e.png" style="filter:brightness(2) saturate(2) hue-rotate(-33deg);" alt="Golden Apple"/></div></div>
+
+    <div id="bar-row" style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 0 0;">
+      <div id="gold-bar" style="flex:1;"><span id="coins">0</span>🟡</div>
+      <div id="cps" style="font-size:1.02em; color:#555; margin-left:16px; text-align:right; white-space:nowrap;"></div>
+    </div>
+    <button id="upgrade-btn" class="action-btn" data-req-level="1">
         Upgrade +<span id="clickValue">1</span> (<span id="upgrade-cost">10</span>🟡)
         <span class="req-text">Lv1</span>
       </button>
@@ -79,12 +804,32 @@
       </button>
     </div>
     <div id="achievements"><h2>Achievements</h2><ol id="achiev-list"></ol></div>
-    <div id="leaderboard"><h2>Leaderboard</h2><ol id="leaders"></ol></div>
-  </div>
+    <div id="leaderboard">
+  <h2>Leaderboard</h2>
+  <button id="change-name-btn" style="margin-bottom:10px;">Change Name</button>
+  <ol id="leaders"></ol>
+</div>
+  
+    <div id="themes" class="tab-content" style="display:none">
+      <h2>Themes & Skins</h2>
+      
+<div id="theme-shop" style="display:flex; flex-direction:column; gap:12px; padding:16px;">
+  <button class="theme-btn" data-theme="default" data-cost="0" style="width:100%;">Normal Mode (Free)</button>
+  <button class="theme-btn" data-theme="dark" data-cost="2" style="width:100%;">Dark Mode (Cost: 2)</button>
+  <button class="theme-btn" data-theme="neon" data-cost="3" style="width:100%;">Neon Mode (Cost: 3)</button>
+  <button class="theme-btn" data-theme="forest" data-cost="4" style="width:100%;">Forest Mode (Cost: 4)</button>
+  <button class="theme-btn" data-theme="sunset" data-cost="5" style="width:100%;">Sunset Mode (Cost: 5)</button>
+</div>
+
+        <div style="margin:12px 0;">
+          </div>
+      </div>
+    </div>
+</div>
   <script>
     document.body.addEventListener('touchmove', e => e.preventDefault(), { passive:false });
 
-    const tabMap={'tab-play':'game','tab-achiev':'achievements','tab-leader':'leaderboard'};
+    const tabMap={'tab-play':'game','tab-achiev':'achievements','tab-leader':'leaderboard', 'tab-themes':'themes'};
     Object.keys(tabMap).forEach(id=>{
       document.getElementById(id).addEventListener('click',()=>{
         Object.keys(tabMap).forEach(k=>{
@@ -114,9 +859,182 @@
         leadEl=document.getElementById('leaders'),
         btns=document.querySelectorAll('.action-btn'),
         fruitBtn=document.getElementById('fruit-btn');
+    tapZone=document.getElementById('tap-zone');
+    
+// Click sound and tap animation
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playClickSound() {
+  const osc = audioCtx.createOscillator();
+  osc.frequency.value = 200; 
+  const gain = audioCtx.createGain();
+  osc.connect(gain).connect(audioCtx.destination);
+  gain.gain.value = 0.1;
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.05);
+}
+fruitBtn.addEventListener('click', () => {
+  playSound(tapBuf); // normal fruit pluck sound
+  
+  
+  fruitBtn.classList.add('tap-animating');
+  setTimeout(() => fruitBtn.classList.remove('tap-animating'), 200);
+
+});
+
+
+// --- Golden Fruit Power-Up ---
+let goldenActive = false, goldenTimeout = null, goldenFruit = document.getElementById('golden-fruit');
+function showGoldenFruit() {
+  if (goldenActive) return;
+  goldenActive = true;
+  goldenFruit.classList.add('active');
+  playSound(tapBuf); // small sound when it appears
+  goldenFruit.style.display = 'block';
+  goldenTimeout = setTimeout(hideGoldenFruit, 4500 + Math.random() * 1000);
+}
+function hideGoldenFruit() {
+  goldenActive = false;
+  goldenFruit.classList.remove('active');
+  goldenFruit.style.display = 'none';
+  if (goldenTimeout) clearTimeout(goldenTimeout);
+  scheduleNextGolden();
+}
+function tapGoldenFruit() {
+  if (!goldenActive) return;
+  goldenActive = false;
+  goldenFruit.classList.remove('active');
+  goldenFruit.style.display = 'none';
+  if (goldenTimeout) clearTimeout(goldenTimeout);
+  // Big coin reward
+  let bonus = state.clickValue * 25;
+  state.coins += bonus;
+  toast('Golden Fruit! +' + bonus + ' 🟡');
+  // Big confetti burst
+  for (let j=0; j<32; j++) {
+    let dot = document.createElement('span');
+    dot.className = 'celebration-dot';
+    const colors = ['#FFD700', '#fff94d', '#ffe600', '#FF4136', '#B10DC9'];
+    dot.style.background = colors[Math.floor(Math.random()*colors.length)];
+    dot.style.left = (10 + Math.random()*80) + 'vw';
+    dot.style.top = (18 + Math.random()*18) + 'vh';
+    dot.style.animationDelay = (Math.random()*0.22)+'s';
+    document.body.appendChild(dot);
+    setTimeout(()=>dot.remove(), 1400);
+  }
+  playSound(purBuf); // play "purchase" sound as bonus effect
+  updateUI();
+  scheduleNextGolden();
+}
+function scheduleNextGolden() {
+  setTimeout(() => showGoldenFruit(), 30000 + Math.random()*30000); // 30–60s
+}
+// Appear at least once after loading
+setTimeout(scheduleNextGolden, 2500);
+goldenFruit.onclick = tapGoldenFruit;
+
+
+// --- Special Achievements Trackers ---
+window._tapHistory = [];
+window._tapStormDone = false;
+window._megaComboDone = false;
+window._goldTouchDone = false;
+window._zenModeDone = false;
+let zenStart = Date.now();
+
+// Override handleTap to support tapstorm, megacombo, goldtouch
+const origHandleTap = handleTap;
+handleTap = function(x, y) {
+  state.totalTaps = (state.totalTaps || 0) + 1;
+  save();
+  // Tap Storm: track tap times
+  window._tapHistory.push(Date.now());
+  window._tapHistory = window._tapHistory.filter(t => t > Date.now() - 10000);
+  if(window._tapHistory.length >= 100) window._tapStormDone = true;
+
+  // Mega Combo: check combo value
+  if (window.combo && window.combo >= 10) window._megaComboDone = true;
+
+  // Gold Touch: check if coins gained in one tap >= 500
+  const coinsBefore = state.coins;
+  origHandleTap(x, y);
+  const gained = state.coins - coinsBefore;
+  if (gained >= 500) window._goldTouchDone = true;
+};
+
+// Zen Mode: checked each second
+setInterval(() => {
+  if (!window._zenModeDone && Date.now() - zenStart >= 30 * 60000) {
+    window._zenModeDone = true;
+  }
+}, 2000);
+
+
+function animateCoinFromUpgrade(sourceId, count=1) {
+  const src = document.getElementById(sourceId);
+  const bar = document.getElementById('gold-bar');
+  if (!src || !bar) return;
+  const srcRect = src.getBoundingClientRect();
+  const barRect = bar.getBoundingClientRect();
+  for (let i = 0; i < count; i++) {
+    const coin = document.createElement('span');
+    coin.className = 'fly-coin';
+    coin.innerHTML = '🟡';
+    // start at random position within source element
+    const startX = srcRect.left + (srcRect.width * (0.3 + Math.random()*0.4));
+    const startY = srcRect.top + (srcRect.height * (0.3 + Math.random()*0.4));
+    coin.style.left = startX + 'px';
+    coin.style.top = startY + 'px';
+    // calculate destination offset
+    const tx = barRect.left + barRect.width/2 - startX - 8 + (Math.random()*14-7);
+    const ty = barRect.top + barRect.height/2 - startY - 8 + (Math.random()*14-7);
+    coin.style.setProperty('--tx', tx+'px');
+    coin.style.setProperty('--ty', ty+'px');
+    document.body.appendChild(coin);
+    setTimeout(()=>coin.remove(), 850);
+  }
+}
+
 
     const LEVEL_BASE=20;
+
+// --- Milestone Celebration ---
+const MILESTONES = {
+  10: "Level 10! Juicy Grower!",
+  25: "Level 25! Orchard King!",
+  50: "Level 50! Fruit Legend!",
+  100: "Level 100! Produce Prodigy!"
+};
+let milestoneCelebrated = {};
+function celebrateMilestone(level) {
+  if (!MILESTONES[level] || milestoneCelebrated[level]) return;
+  milestoneCelebrated[level] = true;
+  // Toast
+  toast(MILESTONES[level]);
+  // Big confetti animation
+  let cDiv = document.createElement('div');
+  cDiv.className = 'big-confetti';
+  for(let i=0; i<45; i++) {
+    let dot = document.createElement('span');
+    dot.className = 'celebration-dot';
+    const colors = ['#FFD700', '#FF4136', '#2ECC40', '#B10DC9', '#FF851B', '#0074D9'];
+    dot.style.background = colors[Math.floor(Math.random()*colors.length)];
+    dot.style.left = (4 + Math.random()*92) + 'vw';
+    dot.style.top = (-4 + Math.random()*6) + 'vh';
+    dot.style.animationDelay = (Math.random()*0.3)+'s';
+    cDiv.appendChild(dot);
+  }
+  document.body.appendChild(cDiv);
+  setTimeout(()=>cDiv.remove(), 1500);
+}
+
     const ACH_LIST=[
+      {key:'tycoon',name:'Fruit Tycoon',check:()=>state.coins>=1000000},
+      {key:'tapstorm',name:'Tap Storm',check:()=>window._tapStormDone},
+      {key:'prestmaniac',name:'Prestige Maniac',check:()=>state.prestigeCount>=10},
+      {key:'megacombo',name:'Mega Combo',check:()=>window._megaComboDone},
+      {key:'goldtouch',name:'Golden Touch',check:()=>window._goldTouchDone},
+      {key:'superfarmer',name:'Super Farmer',check:()=>state.farmhands>=5},
+      {key:'zen',name:'Zen Mode',check:()=>window._zenModeDone},
       {key:'tap1',name:'First Tap',check:()=>state.totalTaps>=1},
       {key:'tap100',name:'Tapped 100',check:()=>state.totalTaps>=100},
       {key:'lvl10',name:'Level 10',check:()=>state.level>=10},
@@ -127,69 +1045,2040 @@
         player=localStorage.getItem('ftPlayer')||(prompt('Enter your name:','Anon')||'Anon');
     localStorage.setItem('ftPlayer',player);
 
+// --- Change Name Button Logic ---
+const changeNameBtn = document.getElementById('change-name-btn');
+if (changeNameBtn) {
+  changeNameBtn.onclick = function() {
+    let newName = prompt('Enter your new player name:', player);
+    if (newName && newName.trim()) {
+      player = newName.trim();
+      localStorage.setItem('ftPlayer', player);
+      updateLeaders();
+    showPrestigeShopButton();
+      toast('Name updated!');
+    }
+  };
+}
+
+
     function save(){ localStorage.setItem('ftState',JSON.stringify(state)); }
     function toast(msg){ let d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.body.appendChild(d); setTimeout(()=>d.remove(),3000); }
     function updateAchievements(){ ACH_LIST.forEach(a=>{ if(a.check()&&!state.achievements[a.key]){ state.achievements[a.key]=true; toast('Achievement: '+a.name); } }); renderAchievements(); }
     function renderAchievements(){ achListEl.innerHTML=''; ACH_LIST.forEach(a=>{ if(state.achievements[a.key]){ let li=document.createElement('li'); li.textContent=a.name; achListEl.appendChild(li); } }); }
     function updateLeaders(){ let e=leaders.find(x=>x.name===player); if(!e){ e={name:player,score:state.coins}; leaders.push(e);} else if(state.coins>e.score) e.score=state.coins; leaders.sort((a,b)=>b.score-a.score); leaders=leaders.slice(0,5); localStorage.setItem('ftLeaders',JSON.stringify(leaders)); leadEl.innerHTML=''; leaders.forEach(x=>{ let li=document.createElement('li'); li.textContent=`${x.name}: ${x.score}`; leadEl.appendChild(li); }); }
-    function updateLevel(){ state.progress++; let th=LEVEL_BASE*state.level; if(state.progress>=th){ state.level++; state.progress-=th;} levelEl.textContent=state.level; fillEl.style.width=(state.progress/th*100)+'%'; prestigeBtn.disabled=state.level<20; }
-    function updateUI(){ if(state.coins<0) state.coins=0; coinsEl.textContent=state.coins; clickValueEl.textContent=state.clickValue; autoPowerEl.textContent=state.autoPower; prestigeCountEl.textContent=state.prestigeCount; ['upgrade','auto','tree','orchard','farmhand'].forEach(id=>document.getElementById(id+'-cost').textContent=state[id+'Cost']); btns.forEach(b=>{ let req=+b.dataset.reqLevel, cost=state[b.id.replace('-btn','')+'Cost']; b.disabled=state.level<req||state.coins<cost; }); updateAchievements(); save(); updateLeaders(); }
+    function updateLevel(){
+  state.progress++;
+  let th = LEVEL_BASE * state.level;
+  let prevLevel = state.level;
+  if (state.progress >= th) {
+    state.level++;
+    state.progress -= th;
+    celebrateMilestone(state.level);
+  }
+  levelEl.textContent = state.level;
+  fillEl.style.width = (state.progress / th * 100) + '%';
+  prestigeBtn.disabled = state.level < 20;
+}
+    function updateUI(){
+
+  // Afford pulse for upgrade buttons
+  let upgrades = [
+    {btn: 'auto-btn', price: state.autoCost},
+    {btn: 'tree-btn', price: state.treeCost},
+    {btn: 'orchard-btn', price: state.orchardCost},
+    {btn: 'farmhand-btn', price: state.farmhandCost}
+  ];
+  upgrades.forEach(u => {
+    let el = document.getElementById(u.btn);
+    if (!el) return;
+    if (state.coins >= u.price) el.classList.add('pulse');
+    else el.classList.remove('pulse');
+  });
+ coinsEl.textContent=state.coins; clickValueEl.textContent=state.clickValue; autoPowerEl.textContent=state.autoPower; prestigeCountEl.textContent=state.prestigeCount; ['upgrade','auto','tree','orchard','farmhand'].forEach(id=>document.getElementById(id+'-cost').textContent=state[id+'Cost']); btns.forEach(b=>{ let req=+b.dataset.reqLevel, cost=state[b.id.replace('-btn','')+'Cost']; b.disabled=state.level<req||state.coins<cost; }); updateAchievements(); save(); updateLeaders();
+    showPrestigeShopButton(); }
 
     document.getElementById('mute-btn').onclick=()=>{
       muted=!muted; bg.muted=muted;
       document.getElementById('mute-btn').textContent=muted?'🔇':'🔊';
     };
-    document.getElementById('reset-btn').onclick=()=>{ localStorage.clear(); location.reload(); };
+    document.getElementById('reset-btn').onclick = () => {
+  if (confirm("Are you sure you want to reset your progress? This cannot be undone!")) {
+    localStorage.clear();
+    location.reload();
+  }
+};
 
-    fruitBtn.addEventListener('click',e=>{
-      playSound(tapBuf);
-      if(bg.paused) bg.play();
-      state.totalTaps++;
-      state.coins+=state.clickValue;
-      const rect=fruitBtn.getBoundingClientRect();
-      const txt=document.createElement('span');
-      txt.className='floating-text';
-      txt.textContent='+'+state.clickValue;
-      document.body.appendChild(txt);
-      txt.style.left=(rect.left+rect.width/2)+'px';
-      txt.style.top=(rect.top+10)+'px';
-      setTimeout(()=>txt.remove(),800);
-      updateLevel(); updateUI();
-    });
+    
+
+function handleTap(x, y) {
+  // Apple wiggle effect
+  fruitBtn.classList.remove('wiggle');
+  void fruitBtn.offsetWidth; // Force reflow for repeat animation
+  fruitBtn.classList.add('wiggle');
+
+  // Play sound & logic
+  playSound(tapBuf);
+  if(bg.paused) bg.play();
+  if (navigator.vibrate) navigator.vibrate(30);
+  state.totalTaps++;
+  state.coins += state.clickValue;
+
+  // Apple pop effect
+  fruitBtn.classList.add('pop');
+  setTimeout(() => fruitBtn.classList.remove('pop'), 250);
+
+  // Ripple effect
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const tzRect = tapZone.getBoundingClientRect();
+  ripple.style.left = (x - tzRect.left - 40) + 'px';
+  ripple.style.top = (y - tzRect.top - 40) + 'px';
+  ripple.style.width = ripple.style.height = '80px';
+  tapZone.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 500);
+
+  // Tap zone flash effect
+  tapZone.classList.add('flash');
+  setTimeout(() => tapZone.classList.remove('flash'), 140);
+
+  // Confetti (fruit burst!)
+  for (let i = 0; i < 7; i++) {
+    const conf = document.createElement('span');
+    conf.className = 'confetti';
+    // Random fruity color
+    const colors = ['#FFD700', '#FF4136', '#2ECC40', '#B10DC9', '#FF851B', '#0074D9'];
+    conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+    // Random direction
+    const angle = (Math.PI * 2 * i / 7) + Math.random()*0.5 - 0.25;
+    const dist = 52 + Math.random()*28;
+    conf.style.setProperty('--x', Math.round(Math.cos(angle)*dist)+'px');
+    conf.style.setProperty('--y', Math.round(Math.sin(angle)*dist)-28+'px');
+    conf.style.left = (x - 6) + 'px';
+    conf.style.top = (y - 16) + 'px';
+    document.body.appendChild(conf);
+    setTimeout(() => conf.remove(), 800);
+  }
+
+  // Random horizontal offset for the floating text
+  const rect = fruitBtn.getBoundingClientRect();
+  const randomOffset = Math.floor(Math.random() * 61) - 30; // -30 to +30px
+  const txt = document.createElement('span');
+  txt.className = 'floating-text';
+  txt.textContent = '+' + state.clickValue;
+  document.body.appendChild(txt);
+  txt.style.left = (rect.left + rect.width / 2 + randomOffset) + 'px';
+  txt.style.top = (rect.top + 10) + 'px';
+  setTimeout(() => txt.remove(), 800);
+  updateLevel();
+  updateUI();
+}
+
+
+// Single tap (desktop, fallback)
+tapZone.addEventListener('click', function(e) {
+  // Only trigger if the click is not on a button inside the tap zone
+  if (!e.target.closest('button')) {
+    handleTap(e.clientX, e.clientY);
+  }
+});
+
+// Multi-touch support
+tapZone.addEventListener('touchstart', function(e) {
+  // Only trigger if not on a button inside tap-zone
+  if ([...e.target.classList].includes('action-btn') || e.target.closest('.action-btn')) return;
+  for (let i = 0; i < e.touches.length; i++) {
+    handleTap(e.touches[i].clientX, e.touches[i].clientY);
+  }
+});
+
 
     prestigeBtn.onclick=()=>{ state.prestigeCount++; state.level=1; state.progress=0; state.coins=0; state.autoHarvest=false; state.autoPower=2; state.trees=0; state.orchards=0; state.farmhands=0; updateLevel(); updateUI(); };
 
     function purchase(key,cb){ if(state.coins<state[key+'Cost']) return; playSound(purBuf); cb(); updateUI(); }
     document.getElementById('upgrade-btn').onclick=()=>purchase('upgrade',()=>{
-      state.coins-=state.upgradeCost; state.clickValue++; state.upgradeCost=Math.floor(state.upgradeCost*1.5);
+      state.coins-=state.upgradeCost;
+  if (state.coins < 0) state.coins = 0; state.clickValue++; state.upgradeCost=Math.floor(state.upgradeCost*1.5);
     });
     document.getElementById('auto-btn').onclick=()=>purchase('auto',()=>{
-      state.coins-=state.autoCost; state.autoHarvest=true; state.autoPower++; state.autoCost=Math.floor(state.autoCost*1.5);
+      state.coins-=state.autoCost;
+  if (state.coins < 0) state.coins = 0; state.autoHarvest=true; state.autoPower++; state.autoCost=Math.floor(state.autoCost*1.5);
     });
     document.getElementById('tree-btn').onclick=()=>purchase('tree',()=>{
-      state.coins-=state.treeCost; state.trees++; state.treeCost=Math.floor(state.treeCost*1.5);
+      state.coins-=state.treeCost;
+  if (state.coins < 0) state.coins = 0; state.trees++; state.treeCost=Math.floor(state.treeCost*1.5);
     });
     document.getElementById('orchard-btn').onclick=()=>purchase('orchard',()=>{
-      state.coins-=state.orchardCost; state.orchards++; state.orchardCost=Math.floor(state.orchardCost*1.5);
+      state.coins-=state.orchardCost;
+  if (state.coins < 0) state.coins = 0; state.orchards++; state.orchardCost=Math.floor(state.orchardCost*1.5);
     });
     document.getElementById('farmhand-btn').onclick=()=>purchase('farmhand',()=>{
-      state.coins-=state.farmhandCost; state.farmhands++; state.farmhandCost=Math.floor(state.farmhandCost*1.5);
+      state.coins-=state.farmhandCost;
+  if (state.coins < 0) state.coins = 0; state.farmhands++; state.farmhandCost=Math.floor(state.farmhandCost*1.5);
     });
 
-    setInterval(()=>{
-      if(state.autoHarvest) state.coins+=state.autoPower;
-      state.coins+=state.trees*5+state.orchards*10+state.farmhands*20;
-      updateUI();
-    },1000);
+    setInterval(() => {
+  
+if (state.autoHarvest) {
+  // Animate coins for autoPower (auto upgrade)
+  if(state.autoPower > 0) animateCoinFromUpgrade('auto-btn', state.autoPower);
+  // Animate coins for trees, orchards, farmhands
+  if(state.trees > 0) animateCoinFromUpgrade('tree-btn', state.trees * 5);
+  if(state.orchards > 0) animateCoinFromUpgrade('orchard-btn', state.orchards * 10);
+  if(state.farmhands > 0) animateCoinFromUpgrade('farmhand-btn', state.farmhands * 20);
+
+  state.coins += state.autoPower;
+  state.coins += state.trees * 5 + state.orchards * 10 + state.farmhands * 20;
+}
+
+  updateUI();
+  // Persist state each tick to avoid lost progress
+  localStorage.setItem('ftState', JSON.stringify(state));
+}, 1000);
 
     updateLevel(); updateUI();
-  </script>
+  
+// --- Animated clouds (inline SVG) background ---
+const cloudAnims = [
+  { id: 'cloud1', speed: 0.13, width: 120, start: -140, end: window.innerWidth+120 },
+  { id: 'cloud2', speed: 0.09, width: 170, start: -240, end: window.innerWidth+170 },
+  { id: 'cloud3', speed: 0.17, width: 90, start: -100, end: window.innerWidth+90 },
+  { id: 'cloud4', speed: 0.07, width: 200, start: -220, end: window.innerWidth+200 },
+];
+function animateClouds() {
+  cloudAnims.forEach(function(cloud, idx) {
+    const el = document.getElementById(cloud.id);
+    if (!el) return;
+    let left = parseFloat(el.style.left);
+    if (isNaN(left)) left = cloud.start;
+    left += cloud.speed;
+    if (left > cloud.end) left = cloud.start - Math.random() * 120;
+    el.style.left = left + "px";
+  });
+  requestAnimationFrame(animateClouds);
+}
+requestAnimationFrame(animateClouds);
+window.addEventListener('resize', () => {
+  cloudAnims[0].end = window.innerWidth+120;
+  cloudAnims[1].end = window.innerWidth+170;
+  cloudAnims[2].end = window.innerWidth+90;
+  cloudAnims[3].end = window.innerWidth+200;
+});
+
+
+// --- Coins Per Second (CPS) Display ---
+let lastCoins = state.coins;
+let lastUpdate = Date.now();
+function updateCPS() {
+  let now = Date.now();
+  let coinsNow = state.coins;
+  let cps = (coinsNow - lastCoins) / ((now - lastUpdate) / 1000);
+  if (cps < 0) cps = 0;
+  document.getElementById("cps").textContent = "Coins/sec: " + cps.toFixed(1);
+  lastCoins = coinsNow;
+  lastUpdate = now;
+}
+setInterval(updateCPS, 1000);
+
+
+// --- Upgrade icon bounce on purchase ---
+function bounceUpgradeBtn(btnId, iconId) {
+  const btn = document.getElementById(btnId);
+  const icn = document.getElementById(iconId);
+  if(btn && icn) {
+    btn.classList.remove('bounce');
+    icn.classList.remove('bounce');
+    void btn.offsetWidth; // force reflow for repeat
+    btn.classList.add('bounce');
+    icn.classList.add('bounce');
+    setTimeout(()=>{btn.classList.remove('bounce');icn.classList.remove('bounce');},270);
+  }
+}
+
+// Patch upgrade buying to bounce icon
+['auto','tree','orchard','farmhand'].forEach(key => {
+  let btn = document.getElementById(key+'-btn');
+  if(btn) {
+    btn.addEventListener('click', () => bounceUpgradeBtn(key+'-btn', key+'-icn'), true);
+    btn.addEventListener('touchstart', () => bounceUpgradeBtn(key+'-btn', key+'-icn'), true);
+  }
+});
+
+
+// --- Funny Fruit Facts ---
+const FRUIT_FACTS = [
+  {key:'banana',txt:"Did you know? Bananas are berries, but strawberries aren’t!"},
+  {key:'applecore',txt:"Apple seeds contain a compound that releases cyanide—but you’d need to eat a LOT for harm."},
+  {key:'watermelon',txt:"Watermelons are 92% water. So hydrating!"},
+  {key:'tomato',txt:"Tomatoes are fruits. That’s right—ketchup is technically a fruit sauce."},
+  {key:'orange',txt:"Oranges are not always orange! In warmer countries, they stay green when ripe."},
+  {key:'avocado',txt:"Avocados have more potassium than bananas."},
+  {key:'pineapple',txt:"It takes 2–3 years to grow one pineapple!"},
+  {key:'lemon',txt:"Lemons float, but limes sink."},
+  {key:'berry',txt:"The most expensive fruit ever? A single Yubari King melon sold for over $27,000!"},
+  {key:'pun',txt:"What did the grape say when it got stepped on? Nothing, it just let out a little wine!"},
+  {key:'cherry',txt:"Cherries can explode in the microwave. (Don't try it at home!)"}
+];
+function getFactsUnlocked() {
+  try { return JSON.parse(localStorage.getItem('fruitFactsUnlocked')||'[]'); } catch { return []; }
+}
+function saveFactsUnlocked(arr) {
+  localStorage.setItem('fruitFactsUnlocked',JSON.stringify(arr));
+}
+function unlockFruitFact(factKey) {
+  let arr = getFactsUnlocked();
+  if (!arr.includes(factKey)) {
+    arr.push(factKey);
+    saveFactsUnlocked(arr);
+    let factObj = FRUIT_FACTS.find(f=>f.key===factKey);
+    if(factObj) showFruitFactToast(factObj.txt);
+  }
+}
+function showFruitFactToast(txt) {
+  let toastDiv = document.createElement('div');
+  toastDiv.className = 'fruit-toast-fact';
+  toastDiv.textContent = txt;
+  document.body.appendChild(toastDiv);
+  setTimeout(()=>toastDiv.remove(),4200);
+}
+// Modal logic
+const factsBtn = document.getElementById('fruit-facts-btn');
+const factsModalBg = document.getElementById('facts-modal-bg');
+const factsList = document.getElementById('facts-list');
+function openFacts() {
+  let arr = getFactsUnlocked();
+  factsList.innerHTML = "";
+  if(arr.length===0) factsList.innerHTML = "<li><i>No facts unlocked yet. Keep tapping!</i></li>";
+  else arr.forEach(key=>{
+    let fact = FRUIT_FACTS.find(f=>f.key===key);
+    if(fact) {
+      let li = document.createElement('li');
+      li.textContent = fact.txt;
+      factsList.appendChild(li);
+    }
+  });
+  factsModalBg.style.display = 'block';
+}
+function closeFacts() { factsModalBg.style.display = 'none'; }
+factsBtn.onclick = openFacts;
+document.getElementById('close-facts').onclick = closeFacts;
+factsModalBg.onclick = function(e){ if(e.target===factsModalBg) closeFacts(); };
+
+// Unlock facts on certain milestones
+function checkFactMilestones() {
+  if(state.level>=5) unlockFruitFact('banana');
+  if(state.level>=12) unlockFruitFact('applecore');
+  if(state.level>=20) unlockFruitFact('watermelon');
+  if(state.level>=25) unlockFruitFact('orange');
+  if(state.level>=35) unlockFruitFact('avocado');
+  if(state.trees>=2) unlockFruitFact('tomato');
+  if(state.orchards>=2) unlockFruitFact('pineapple');
+  if(state.farmhands>=2) unlockFruitFact('lemon');
+  if(state.level>=40) unlockFruitFact('berry');
+  if(state.level>=50) unlockFruitFact('cherry');
+  if(state.prestigeCount>=1) unlockFruitFact('pun');
+}
+// Call this on interval
+setInterval(checkFactMilestones, 1200);
+
+
+// --- First Tap Tutorial Popover ---
+(function(){
+  function showFirstTapPopover() {
+    var pop = document.getElementById('first-tap-popover');
+    if (!pop) return;
+    if (!localStorage.getItem('hasPlayedFruitTapper')) {
+      pop.classList.add('active');
+      // Hide after 8 seconds (fallback)
+      setTimeout(() => { pop.classList.remove('active'); }, 8000);
+    }
+  }
+  function hideFirstTapPopover() {
+    var pop = document.getElementById('first-tap-popover');
+    if (pop) pop.classList.remove('active');
+  }
+  // Attach hide logic to *any* fruit tap
+  function markFirstTapPlayed() {
+    if (!localStorage.getItem('hasPlayedFruitTapper')) {
+      localStorage.setItem('hasPlayedFruitTapper', 'yes');
+      hideFirstTapPopover();
+    }
+  }
+  window.addEventListener('DOMContentLoaded', function() {
+    var fruitBtn = document.getElementById('fruit-btn');
+    if (fruitBtn) {
+      showFirstTapPopover();
+      fruitBtn.addEventListener('click', markFirstTapPlayed, {capture:true});
+      fruitBtn.addEventListener('touchstart', markFirstTapPlayed, {capture:true});
+    }
+    // If reset button exists, clear tutorial flag on reset
+    var resetBtn = document.getElementById('reset-game') || document.querySelector('.reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        localStorage.removeItem('hasPlayedFruitTapper');
+      });
+    }
+  });
+})();
+
+
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn) return;
+  if (state.prestigeCount > 0) {
+    btn.style.display = "";
+  } else {
+    btn.style.display = "none";
+  }
+}
+document.getElementById('prestige-shop-btn').onclick = function() {
+  openPrestigeShop();
+};
+
+
+// --- Auto-open Prestige Shop after prestige ---
+let _realPrestige = prestige;
+prestige = function() {
+  _realPrestige.apply(this, arguments);
+  setTimeout(() => {
+    if(state.prestigeCount > 0) openPrestigeShop();
+  }, 350); // give state a moment to update
+};
+
+
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn || !window.state) return;
+  if (state.prestigeCount && state.prestigeCount > 0) {
+    btn.style.display = "";
+  } else {
+    btn.style.display = "none";
+  }
+}
+document.addEventListener("DOMContentLoaded", showPrestigeShopButton);
+document.getElementById('prestige-shop-btn').onclick = function() {
+  if (typeof openPrestigeShop === 'function') openPrestigeShop();
+};
+
+
+function prestigeShopButtonShowTick() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn) return;
+  try {
+    if (window.state && typeof state.prestigeCount !== "undefined" && state.prestigeCount > 0) {
+      btn.style.display = "";
+      // console.log("Prestige Shop button shown (prestigeCount=" + state.prestigeCount + ")");
+    } else {
+      btn.style.display = "none";
+      // console.log("Prestige Shop button hidden (prestigeCount missing or 0)");
+    }
+  } catch(e) {
+    // console.log("Prestige Shop button error: " + e);
+    btn.style.display = "none";
+  }
+}
+document.getElementById('prestige-shop-btn').onclick = function() {
+  if (typeof openPrestigeShop === 'function') openPrestigeShop();
+};
+// Update on every UI update, page load, and every second just in case
+document.addEventListener("DOMContentLoaded", prestigeShopButtonShowTick);
+setInterval(prestigeShopButtonShowTick, 1200);
+if (typeof updateUI === "function") {
+  let oldUpdateUI = updateUI;
+  updateUI = function() {
+    prestigeShopButtonShowTick();
+    oldUpdateUI.apply(this, arguments);
+  }
+}
+
+
+// Prestige Shop Data
+const prestigeUpgrades = [
+  {
+    id: "fruit_mult",
+    label: "Fruit Multiplier (+10%)",
+    desc: "All earnings increased by 10%. Stacks.",
+    baseCost: 1,
+    buyLimit: 100,
+    getOwned: () => Number(localStorage.getItem('prestige_fruit_mult')||'0'),
+    buy: function() {
+      let owned = this.getOwned();
+      if (state.prestigeCount < this.baseCost || owned >= this.buyLimit) return false;
+      localStorage.setItem('prestige_fruit_mult', owned+1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "golden_freq",
+    label: "Golden Fruit x2",
+    desc: "Golden fruit appears twice as often.",
+    baseCost: 3,
+    buyLimit: 1,
+    getOwned: () => Number(localStorage.getItem('prestige_golden_freq')||'0'),
+    buy: function() {
+      if (state.prestigeCount < this.baseCost || this.getOwned() >= this.buyLimit) return false;
+      localStorage.setItem('prestige_golden_freq', 1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "auto_boost",
+    label: "Auto-Harvest +20%",
+    desc: "Auto-harvest is 20% faster per upgrade.",
+    baseCost: 5,
+    buyLimit: 5,
+    getOwned: () => Number(localStorage.getItem('prestige_auto_boost')||'0'),
+    buy: function() {
+      let owned = this.getOwned();
+      if (state.prestigeCount < this.baseCost || owned >= this.buyLimit) return false;
+      localStorage.setItem('prestige_auto_boost', owned+1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "prestige_saver",
+    label: "Prestige Saver",
+    desc: "+1 free Prestige Point each prestige. One time.",
+    baseCost: 7,
+    buyLimit: 1,
+    getOwned: () => Number(localStorage.getItem('prestige_saver')||'0'),
+    buy: function() {
+      if (state.prestigeCount < this.baseCost || this.getOwned() >= this.buyLimit) return false;
+      localStorage.setItem('prestige_saver', 1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "theme_unlock",
+    label: "Unlock Theme",
+    desc: "Unlocks a special background theme.",
+    baseCost: 3,
+    buyLimit: 1,
+    getOwned: () => Number(localStorage.getItem('prestige_theme')||'0'),
+    buy: function() {
+      if (state.prestigeCount < this.baseCost || this.getOwned() >= this.buyLimit) return false;
+      localStorage.setItem('prestige_theme', 1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      // Apply theme instantly
+      document.body.style.background = "#f8f4ff";
+      return true;
+    }
+  }
+];
+
+function getPrestigePoints() {
+  return state.prestigeCount || 0;
+}
+function renderPrestigeShop() {
+  let list = document.getElementById("prestige-shop-list");
+  let pts = getPrestigePoints();
+  let html = `<div style='font-weight:bold;font-size:1.1em;text-align:center;'>Prestige Points: <span style="color:#5b0080;">${pts}</span></div>`;
+  for (let u of prestigeUpgrades) {
+    let owned = u.getOwned();
+    let ownedStr = owned > 0 ? `<span style="color:green;font-weight:bold;"> (x${owned})</span>` : '';
+    let canBuy = (pts >= u.baseCost) && (owned < u.buyLimit);
+    html += `<div style="margin:14px 0 8px 0;padding:10px 6px 9px 6px;border-radius:13px;border:1.5px solid #ddd;background:#f4f1fa;">
+      <b>${u.label}</b>${ownedStr}<br>
+      <span style="font-size:0.96em;color:#553;">${u.desc}</span><br>
+      <button onclick="prestigeBuyUpgrade('${u.id}')" ${canBuy?'':'disabled'} style="margin-top:6px;background:${canBuy?'#e7d4ff':'#ccc'};color:${canBuy?'#5b0080':'#999'};border:none;padding:6px 19px;border-radius:11px;font-weight:bold;cursor:${canBuy?'pointer':'default'};">Buy (${u.baseCost})</button>
+    </div>`;
+  }
+  list.innerHTML = html;
+}
+
+function openPrestigeShop() {
+  document.body.classList.add("prestige-open");
+  document.getElementById("prestige-shop-modal").style.display = "flex";
+  renderPrestigeShop();
+}
+function closePrestigeShop() {
+  document.body.classList.remove("prestige-open");
+  document.getElementById("prestige-shop-modal").style.display = "none";
+}
+function prestigeBuyUpgrade(upg) {
+  let upgrade = prestigeUpgrades.find(u=>u.id==upg);
+  if (upgrade) upgrade.buy();
+}
+
+// Show shop button logic (runs every second, and on UI update)
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn || !window.state) return;
+  if (state.prestigeCount && state.prestigeCount > 0) {
+    btn.style.display = "";
+  } else {
+    btn.style.display = "none";
+  }
+}
+document.addEventListener("DOMContentLoaded", showPrestigeShopButton);
+setInterval(showPrestigeShopButton, 1200);
+document.getElementById('prestige-shop-btn').onclick = openPrestigeShop;
+// Call after UI update
+if (typeof updateUI === "function") {
+  let oldUpdateUI = updateUI;
+  updateUI = function() {
+    showPrestigeShopButton();
+    oldUpdateUI.apply(this, arguments);
+  }
+}
+// Auto-open shop after prestige
+if (typeof prestige === "function") {
+  let _realPrestige = prestige;
+  prestige = function() {
+    _realPrestige.apply(this, arguments);
+    setTimeout(() => {
+      if(state.prestigeCount > 0) openPrestigeShop();
+    }, 350);
+  };
+}
+
+// Apply permanent upgrades to game logic (called on game load and after buying)
+function applyPrestigeUpgrades() {
+  // Fruit multiplier
+  let mult = 1 + 0.1 * (Number(localStorage.getItem('prestige_fruit_mult')||'0'));
+  state.fruitMultiplier = mult;
+  // Golden fruit frequency
+  state.goldenFruitFreq = Number(localStorage.getItem('prestige_golden_freq')||'0') ? 2 : 1;
+  // Auto-harvest speed
+  state.autoBoost = 1 + 0.2 * (Number(localStorage.getItem('prestige_auto_boost')||'0'));
+  // Prestige Saver
+  state.prestigeSaver = Number(localStorage.getItem('prestige_saver')||'0');
+  // Theme unlock
+  if(Number(localStorage.getItem('prestige_theme')||'0')){
+    document.body.style.background = "#f8f4ff";
+  }
+}
+// Call on load and after upgrades
+document.addEventListener("DOMContentLoaded", applyPrestigeUpgrades);
+setInterval(applyPrestigeUpgrades, 3000);
+
+
+// --- Daily Reward System ---
+const DAILY_COOLDOWN_HOURS = 24;
+const dailyBtn = document.getElementById('daily-reward-btn');
+
+function getLastDailyTime() {
+  return Number(localStorage.getItem('fruitDailyClaim') || '0');
+}
+function canClaimDaily() {
+  const now = Date.now();
+  return now - getLastDailyTime() > DAILY_COOLDOWN_HOURS * 3600 * 1000;
+}
+function showDailyBtn() {
+  if (canClaimDaily()) {
+    dailyBtn.style.display = '';
+  } else {
+    dailyBtn.style.display = 'none';
+  }
+}
+function claimDailyReward() {
+  const bonus = 100 * (1 + (state.prestigeCount || 0));
+  state.coins += bonus;
+  toast('🎉 Daily Reward! +' + bonus + ' 🟡');
+  localStorage.setItem('fruitDailyClaim', Date.now());
+  updateUI();
+  showDailyBtn();
+}
+
+dailyBtn.onclick = claimDailyReward;
+
+// Check to show button on load/interval/UI update
+showDailyBtn();
+setInterval(showDailyBtn, 15000); // Check every 15s
+// Also, patch into updateUI if you want instant update:
+if (typeof updateUI === "function") {
+  const oldUpdateUI = updateUI;
+  updateUI = function() {
+    oldUpdateUI.apply(this, arguments);
+    showDailyBtn();
+  };
+}
+
+</script>
+
+
+  <!-- Update Available banner (hidden by default) -->
+  <div id="update-banner" style="
+      display: none;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #ffd700;
+      color: #000;
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+    ">
+    🔄 New version available – click to update!
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        // Show banner if there's an updated SW waiting
+        if (reg.waiting) showUpdateBanner();
+
+        // Listen for new SW installations
+        reg.addEventListener('updatefound', () => {
+          reg.installing.addEventListener('statechange', () => {
+            if (reg.installing.state === 'installed'
+                && navigator.serviceWorker.controller) {
+              showUpdateBanner();
+            }
+          });
+        });
+      });
+
+      // Reload once the new SW takes control
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }
+
+    function showUpdateBanner() {
+      const banner = document.getElementById('update-banner');
+      banner.style.display = 'block';
+      banner.onclick = () => {
+        // Tell SW to skipWaiting()
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (reg.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      };
+    }
+  
+// --- Animated clouds (inline SVG) background ---
+const cloudAnims = [
+  { id: 'cloud1', speed: 0.13, width: 120, start: -140, end: window.innerWidth+120 },
+  { id: 'cloud2', speed: 0.09, width: 170, start: -240, end: window.innerWidth+170 },
+  { id: 'cloud3', speed: 0.17, width: 90, start: -100, end: window.innerWidth+90 },
+  { id: 'cloud4', speed: 0.07, width: 200, start: -220, end: window.innerWidth+200 },
+];
+function animateClouds() {
+  cloudAnims.forEach(function(cloud, idx) {
+    const el = document.getElementById(cloud.id);
+    if (!el) return;
+    let left = parseFloat(el.style.left);
+    if (isNaN(left)) left = cloud.start;
+    left += cloud.speed;
+    if (left > cloud.end) left = cloud.start - Math.random() * 120;
+    el.style.left = left + "px";
+  });
+  requestAnimationFrame(animateClouds);
+}
+requestAnimationFrame(animateClouds);
+window.addEventListener('resize', () => {
+  cloudAnims[0].end = window.innerWidth+120;
+  cloudAnims[1].end = window.innerWidth+170;
+  cloudAnims[2].end = window.innerWidth+90;
+  cloudAnims[3].end = window.innerWidth+200;
+});
+
+
+// --- Coins Per Second (CPS) Display ---
+let lastCoins = state.coins;
+let lastUpdate = Date.now();
+function updateCPS() {
+  let now = Date.now();
+  let coinsNow = state.coins;
+  let cps = (coinsNow - lastCoins) / ((now - lastUpdate) / 1000);
+  if (cps < 0) cps = 0;
+  document.getElementById("cps").textContent = "Coins/sec: " + cps.toFixed(1);
+  lastCoins = coinsNow;
+  lastUpdate = now;
+}
+setInterval(updateCPS, 1000);
+
+
+// --- Upgrade icon bounce on purchase ---
+function bounceUpgradeBtn(btnId, iconId) {
+  const btn = document.getElementById(btnId);
+  const icn = document.getElementById(iconId);
+  if(btn && icn) {
+    btn.classList.remove('bounce');
+    icn.classList.remove('bounce');
+    void btn.offsetWidth; // force reflow for repeat
+    btn.classList.add('bounce');
+    icn.classList.add('bounce');
+    setTimeout(()=>{btn.classList.remove('bounce');icn.classList.remove('bounce');},270);
+  }
+}
+
+// Patch upgrade buying to bounce icon
+['auto','tree','orchard','farmhand'].forEach(key => {
+  let btn = document.getElementById(key+'-btn');
+  if(btn) {
+    btn.addEventListener('click', () => bounceUpgradeBtn(key+'-btn', key+'-icn'), true);
+    btn.addEventListener('touchstart', () => bounceUpgradeBtn(key+'-btn', key+'-icn'), true);
+  }
+});
+
+
+// --- Funny Fruit Facts ---
+const FRUIT_FACTS = [
+  {key:'banana',txt:"Did you know? Bananas are berries, but strawberries aren’t!"},
+  {key:'applecore',txt:"Apple seeds contain a compound that releases cyanide—but you’d need to eat a LOT for harm."},
+  {key:'watermelon',txt:"Watermelons are 92% water. So hydrating!"},
+  {key:'tomato',txt:"Tomatoes are fruits. That’s right—ketchup is technically a fruit sauce."},
+  {key:'orange',txt:"Oranges are not always orange! In warmer countries, they stay green when ripe."},
+  {key:'avocado',txt:"Avocados have more potassium than bananas."},
+  {key:'pineapple',txt:"It takes 2–3 years to grow one pineapple!"},
+  {key:'lemon',txt:"Lemons float, but limes sink."},
+  {key:'berry',txt:"The most expensive fruit ever? A single Yubari King melon sold for over $27,000!"},
+  {key:'pun',txt:"What did the grape say when it got stepped on? Nothing, it just let out a little wine!"},
+  {key:'cherry',txt:"Cherries can explode in the microwave. (Don't try it at home!)"}
+];
+function getFactsUnlocked() {
+  try { return JSON.parse(localStorage.getItem('fruitFactsUnlocked')||'[]'); } catch { return []; }
+}
+function saveFactsUnlocked(arr) {
+  localStorage.setItem('fruitFactsUnlocked',JSON.stringify(arr));
+}
+function unlockFruitFact(factKey) {
+  let arr = getFactsUnlocked();
+  if (!arr.includes(factKey)) {
+    arr.push(factKey);
+    saveFactsUnlocked(arr);
+    let factObj = FRUIT_FACTS.find(f=>f.key===factKey);
+    if(factObj) showFruitFactToast(factObj.txt);
+  }
+}
+function showFruitFactToast(txt) {
+  let toastDiv = document.createElement('div');
+  toastDiv.className = 'fruit-toast-fact';
+  toastDiv.textContent = txt;
+  document.body.appendChild(toastDiv);
+  setTimeout(()=>toastDiv.remove(),4200);
+}
+// Modal logic
+const factsBtn = document.getElementById('fruit-facts-btn');
+const factsModalBg = document.getElementById('facts-modal-bg');
+const factsList = document.getElementById('facts-list');
+function openFacts() {
+  let arr = getFactsUnlocked();
+  factsList.innerHTML = "";
+  if(arr.length===0) factsList.innerHTML = "<li><i>No facts unlocked yet. Keep tapping!</i></li>";
+  else arr.forEach(key=>{
+    let fact = FRUIT_FACTS.find(f=>f.key===key);
+    if(fact) {
+      let li = document.createElement('li');
+      li.textContent = fact.txt;
+      factsList.appendChild(li);
+    }
+  });
+  factsModalBg.style.display = 'block';
+}
+function closeFacts() { factsModalBg.style.display = 'none'; }
+factsBtn.onclick = openFacts;
+document.getElementById('close-facts').onclick = closeFacts;
+factsModalBg.onclick = function(e){ if(e.target===factsModalBg) closeFacts(); };
+
+// Unlock facts on certain milestones
+function checkFactMilestones() {
+  if(state.level>=5) unlockFruitFact('banana');
+  if(state.level>=12) unlockFruitFact('applecore');
+  if(state.level>=20) unlockFruitFact('watermelon');
+  if(state.level>=25) unlockFruitFact('orange');
+  if(state.level>=35) unlockFruitFact('avocado');
+  if(state.trees>=2) unlockFruitFact('tomato');
+  if(state.orchards>=2) unlockFruitFact('pineapple');
+  if(state.farmhands>=2) unlockFruitFact('lemon');
+  if(state.level>=40) unlockFruitFact('berry');
+  if(state.level>=50) unlockFruitFact('cherry');
+  if(state.prestigeCount>=1) unlockFruitFact('pun');
+}
+// Call this on interval
+setInterval(checkFactMilestones, 1200);
+
+
+// --- First Tap Tutorial Popover ---
+(function(){
+  function showFirstTapPopover() {
+    var pop = document.getElementById('first-tap-popover');
+    if (!pop) return;
+    if (!localStorage.getItem('hasPlayedFruitTapper')) {
+      pop.classList.add('active');
+      // Hide after 8 seconds (fallback)
+      setTimeout(() => { pop.classList.remove('active'); }, 8000);
+    }
+  }
+  function hideFirstTapPopover() {
+    var pop = document.getElementById('first-tap-popover');
+    if (pop) pop.classList.remove('active');
+  }
+  // Attach hide logic to *any* fruit tap
+  function markFirstTapPlayed() {
+    if (!localStorage.getItem('hasPlayedFruitTapper')) {
+      localStorage.setItem('hasPlayedFruitTapper', 'yes');
+      hideFirstTapPopover();
+    }
+  }
+  window.addEventListener('DOMContentLoaded', function() {
+    var fruitBtn = document.getElementById('fruit-btn');
+    if (fruitBtn) {
+      showFirstTapPopover();
+      fruitBtn.addEventListener('click', markFirstTapPlayed, {capture:true});
+      fruitBtn.addEventListener('touchstart', markFirstTapPlayed, {capture:true});
+    }
+    // If reset button exists, clear tutorial flag on reset
+    var resetBtn = document.getElementById('reset-game') || document.querySelector('.reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        localStorage.removeItem('hasPlayedFruitTapper');
+      });
+    }
+  });
+})();
+
+
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn) return;
+  if (state.prestigeCount > 0) {
+    btn.style.display = "";
+  } else {
+    btn.style.display = "none";
+  }
+}
+document.getElementById('prestige-shop-btn').onclick = function() {
+  openPrestigeShop();
+};
+
+
+// --- Auto-open Prestige Shop after prestige ---
+let _realPrestige = prestige;
+prestige = function() {
+  _realPrestige.apply(this, arguments);
+  setTimeout(() => {
+    if(state.prestigeCount > 0) openPrestigeShop();
+  }, 350); // give state a moment to update
+};
+
+
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn || !window.state) return;
+  if (state.prestigeCount && state.prestigeCount > 0) {
+    btn.style.display = "";
+  } else {
+    btn.style.display = "none";
+  }
+}
+document.addEventListener("DOMContentLoaded", showPrestigeShopButton);
+document.getElementById('prestige-shop-btn').onclick = function() {
+  if (typeof openPrestigeShop === 'function') openPrestigeShop();
+};
+
+
+function prestigeShopButtonShowTick() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn) return;
+  try {
+    if (window.state && typeof state.prestigeCount !== "undefined" && state.prestigeCount > 0) {
+      btn.style.display = "";
+      // console.log("Prestige Shop button shown (prestigeCount=" + state.prestigeCount + ")");
+    } else {
+      btn.style.display = "none";
+      // console.log("Prestige Shop button hidden (prestigeCount missing or 0)");
+    }
+  } catch(e) {
+    // console.log("Prestige Shop button error: " + e);
+    btn.style.display = "none";
+  }
+}
+document.getElementById('prestige-shop-btn').onclick = function() {
+  if (typeof openPrestigeShop === 'function') openPrestigeShop();
+};
+// Update on every UI update, page load, and every second just in case
+document.addEventListener("DOMContentLoaded", prestigeShopButtonShowTick);
+setInterval(prestigeShopButtonShowTick, 1200);
+if (typeof updateUI === "function") {
+  let oldUpdateUI = updateUI;
+  updateUI = function() {
+    prestigeShopButtonShowTick();
+    oldUpdateUI.apply(this, arguments);
+  }
+}
+
+
+// Prestige Shop Data
+const prestigeUpgrades = [
+  {
+    id: "fruit_mult",
+    label: "Fruit Multiplier (+10%)",
+    desc: "All earnings increased by 10%. Stacks.",
+    baseCost: 1,
+    buyLimit: 100,
+    getOwned: () => Number(localStorage.getItem('prestige_fruit_mult')||'0'),
+    buy: function() {
+      let owned = this.getOwned();
+      if (state.prestigeCount < this.baseCost || owned >= this.buyLimit) return false;
+      localStorage.setItem('prestige_fruit_mult', owned+1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "golden_freq",
+    label: "Golden Fruit x2",
+    desc: "Golden fruit appears twice as often.",
+    baseCost: 3,
+    buyLimit: 1,
+    getOwned: () => Number(localStorage.getItem('prestige_golden_freq')||'0'),
+    buy: function() {
+      if (state.prestigeCount < this.baseCost || this.getOwned() >= this.buyLimit) return false;
+      localStorage.setItem('prestige_golden_freq', 1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "auto_boost",
+    label: "Auto-Harvest +20%",
+    desc: "Auto-harvest is 20% faster per upgrade.",
+    baseCost: 5,
+    buyLimit: 5,
+    getOwned: () => Number(localStorage.getItem('prestige_auto_boost')||'0'),
+    buy: function() {
+      let owned = this.getOwned();
+      if (state.prestigeCount < this.baseCost || owned >= this.buyLimit) return false;
+      localStorage.setItem('prestige_auto_boost', owned+1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "prestige_saver",
+    label: "Prestige Saver",
+    desc: "+1 free Prestige Point each prestige. One time.",
+    baseCost: 7,
+    buyLimit: 1,
+    getOwned: () => Number(localStorage.getItem('prestige_saver')||'0'),
+    buy: function() {
+      if (state.prestigeCount < this.baseCost || this.getOwned() >= this.buyLimit) return false;
+      localStorage.setItem('prestige_saver', 1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      return true;
+    }
+  },
+  {
+    id: "theme_unlock",
+    label: "Unlock Theme",
+    desc: "Unlocks a special background theme.",
+    baseCost: 3,
+    buyLimit: 1,
+    getOwned: () => Number(localStorage.getItem('prestige_theme')||'0'),
+    buy: function() {
+      if (state.prestigeCount < this.baseCost || this.getOwned() >= this.buyLimit) return false;
+      localStorage.setItem('prestige_theme', 1);
+      state.prestigeCount -= this.baseCost;
+      state.prestigeSpent = (state.prestigeSpent||0)+this.baseCost;
+      saveState(); updateUI(); openPrestigeShop();
+      // Apply theme instantly
+      document.body.style.background = "#f8f4ff";
+      return true;
+    }
+  }
+];
+
+function getPrestigePoints() {
+  return state.prestigeCount || 0;
+}
+function renderPrestigeShop() {
+  let list = document.getElementById("prestige-shop-list");
+  let pts = getPrestigePoints();
+  let html = `<div style='font-weight:bold;font-size:1.1em;text-align:center;'>Prestige Points: <span style="color:#5b0080;">${pts}</span></div>`;
+  for (let u of prestigeUpgrades) {
+    let owned = u.getOwned();
+    let ownedStr = owned > 0 ? `<span style="color:green;font-weight:bold;"> (x${owned})</span>` : '';
+    let canBuy = (pts >= u.baseCost) && (owned < u.buyLimit);
+    html += `<div style="margin:14px 0 8px 0;padding:10px 6px 9px 6px;border-radius:13px;border:1.5px solid #ddd;background:#f4f1fa;">
+      <b>${u.label}</b>${ownedStr}<br>
+      <span style="font-size:0.96em;color:#553;">${u.desc}</span><br>
+      <button onclick="prestigeBuyUpgrade('${u.id}')" ${canBuy?'':'disabled'} style="margin-top:6px;background:${canBuy?'#e7d4ff':'#ccc'};color:${canBuy?'#5b0080':'#999'};border:none;padding:6px 19px;border-radius:11px;font-weight:bold;cursor:${canBuy?'pointer':'default'};">Buy (${u.baseCost})</button>
+    </div>`;
+  }
+  list.innerHTML = html;
+}
+
+function openPrestigeShop() {
+  document.body.classList.add("prestige-open");
+  document.getElementById("prestige-shop-modal").style.display = "flex";
+  renderPrestigeShop();
+}
+function closePrestigeShop() {
+  document.body.classList.remove("prestige-open");
+  document.getElementById("prestige-shop-modal").style.display = "none";
+}
+function prestigeBuyUpgrade(upg) {
+  let upgrade = prestigeUpgrades.find(u=>u.id==upg);
+  if (upgrade) upgrade.buy();
+}
+
+// Show shop button logic (runs every second, and on UI update)
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (!btn || !window.state) return;
+  if (state.prestigeCount && state.prestigeCount > 0) {
+    btn.style.display = "";
+  } else {
+    btn.style.display = "none";
+  }
+}
+document.addEventListener("DOMContentLoaded", showPrestigeShopButton);
+setInterval(showPrestigeShopButton, 1200);
+document.getElementById('prestige-shop-btn').onclick = openPrestigeShop;
+// Call after UI update
+if (typeof updateUI === "function") {
+  let oldUpdateUI = updateUI;
+  updateUI = function() {
+    showPrestigeShopButton();
+    oldUpdateUI.apply(this, arguments);
+  }
+}
+// Auto-open shop after prestige
+if (typeof prestige === "function") {
+  let _realPrestige = prestige;
+  prestige = function() {
+    _realPrestige.apply(this, arguments);
+    setTimeout(() => {
+      if(state.prestigeCount > 0) openPrestigeShop();
+    }, 350);
+  };
+}
+
+// Apply permanent upgrades to game logic (called on game load and after buying)
+function applyPrestigeUpgrades() {
+  // Fruit multiplier
+  let mult = 1 + 0.1 * (Number(localStorage.getItem('prestige_fruit_mult')||'0'));
+  state.fruitMultiplier = mult;
+  // Golden fruit frequency
+  state.goldenFruitFreq = Number(localStorage.getItem('prestige_golden_freq')||'0') ? 2 : 1;
+  // Auto-harvest speed
+  state.autoBoost = 1 + 0.2 * (Number(localStorage.getItem('prestige_auto_boost')||'0'));
+  // Prestige Saver
+  state.prestigeSaver = Number(localStorage.getItem('prestige_saver')||'0');
+  // Theme unlock
+  if(Number(localStorage.getItem('prestige_theme')||'0')){
+    document.body.style.background = "#f8f4ff";
+  }
+}
+// Call on load and after upgrades
+document.addEventListener("DOMContentLoaded", applyPrestigeUpgrades);
+setInterval(applyPrestigeUpgrades, 3000);
+
+
+// --- Daily Reward System ---
+const DAILY_COOLDOWN_HOURS = 24;
+const dailyBtn = document.getElementById('daily-reward-btn');
+
+function getLastDailyTime() {
+  return Number(localStorage.getItem('fruitDailyClaim') || '0');
+}
+function canClaimDaily() {
+  const now = Date.now();
+  return now - getLastDailyTime() > DAILY_COOLDOWN_HOURS * 3600 * 1000;
+}
+function showDailyBtn() {
+  if (canClaimDaily()) {
+    dailyBtn.style.display = '';
+  } else {
+    dailyBtn.style.display = 'none';
+  }
+}
+function claimDailyReward() {
+  const bonus = 100 * (1 + (state.prestigeCount || 0));
+  state.coins += bonus;
+  toast('🎉 Daily Reward! +' + bonus + ' 🟡');
+  localStorage.setItem('fruitDailyClaim', Date.now());
+  updateUI();
+  showDailyBtn();
+}
+
+dailyBtn.onclick = claimDailyReward;
+
+// Check to show button on load/interval/UI update
+showDailyBtn();
+setInterval(showDailyBtn, 15000); // Check every 15s
+// Also, patch into updateUI if you want instant update:
+if (typeof updateUI === "function") {
+  const oldUpdateUI = updateUI;
+  updateUI = function() {
+    oldUpdateUI.apply(this, arguments);
+    showDailyBtn();
+  };
+}
+
+</script>
+
+  <div id="facts-modal-bg">
+    <div id="facts-modal">
+      <button class="close-btn" id="close-facts">&times;</button>
+      <h2>🍉 Fruit Facts Unlocked</h2>
+      <ul id="facts-list"></ul>
+    </div>
+  </div>
+
+<canvas id="particle-canvas"></canvas>
+<script>
+// Particle burst effect
+const particleCanvas = document.getElementById('particle-canvas');
+const ctx = particleCanvas.getContext('2d');
+function resizeCanvas() {
+  particleCanvas.width = window.innerWidth;
+  particleCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+let particles = [];
+function createParticles(x, y) {
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4,
+      size: Math.random() * 4 + 2,
+      life: 60
+    });
+  }
+}
+
+function updateParticles() {
+  ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    ctx.globalAlpha = p.life / 60;
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+  requestAnimationFrame(updateParticles);
+}
+updateParticles();
+
+const fruitBtn = document.getElementById('tap-zone');
+fruitBtn.addEventListener('click', (e) => {
+  const rect = fruitBtn.getBoundingClientRect();
+  createParticles(
+    rect.left + rect.width / 2,
+    rect.top + rect.height / 2
+  );
+});
+</script>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
+// Add glow effect on upgrade buttons
+const upgradeButtons = document.querySelectorAll('button[data-req-level]');
+upgradeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.add('upgrade-effect');
+    btn.addEventListener('animationend', () => {
+      btn.classList.remove('upgrade-effect');
+    }, { once: true });
+  });
+});
+</script>
+
+<script>
+// Enhance upgrade buttons with scale effect and particle burst
+const upgradeButtons = document.querySelectorAll('button[data-req-level]');
+upgradeButtons.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    // Glow effect already applied; add scale bounce
+    btn.classList.add('scale-effect');
+    btn.addEventListener('animationend', () => {
+      btn.classList.remove('scale-effect');
+    }, { once: true });
+
+    // Particle burst at button center
+    const rect = btn.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    createParticles(x, y);
+  });
+});
+</script>
+
+<script>
+// Play upgrade sound
+function playUpgradeSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(400, ctx.currentTime);
+  g.gain.setValueAtTime(0.2, ctx.currentTime);
+  o.connect(g).connect(ctx.destination);
+  o.start();
+  o.stop(ctx.currentTime + 0.1);
+}
+
+// Colored particle burst
+function createColoredParticles(x, y) {
+  const colors = ['#FFD700', '#FF6347', '#ADFF2F', '#00BFFF', '#FF69B4'];
+  for (let i = 0; i < 30; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      size: Math.random() * 4 + 2,
+      life: 50,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
   }
+}
+
+// Override previous updateParticles to use color property
+const origUpdate = updateParticles;
+updateParticles = function() {
+  ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    ctx.globalAlpha = p.life / 50;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+  requestAnimationFrame(updateParticles);
+};
+
+// Bind to upgrade buttons
+const upgradeButtons = document.querySelectorAll('button[data-req-level]');
+upgradeButtons.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    // Super visual effect
+    btn.classList.add('super-upgrade');
+    btn.addEventListener('animationend', () => {
+      btn.classList.remove('super-upgrade');
+    }, { once: true });
+
+    // Play sound
+    playUpgradeSound();
+
+    // Confetti particles
+    const rect = btn.getBoundingClientRect();
+    createColoredParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+  });
+});
+</script>
+
+<script>
+// Create toast notification
+function createToast(msg) {
+  const toast = document.createElement('div');
+  toast.id = 'upgrade-toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  // Remove after animation
+  toast.addEventListener('animationend', () => {
+    toast.remove();
+  });
+}
+
+// Screen shake effect on container
+function triggerShake() {
+  document.body.classList.add('shake');
+  document.body.addEventListener('animationend', () => {
+    document.body.classList.remove('shake');
+  }, { once: true });
+}
+
+// Hook into upgrade buttons
+const upgradeButtons = document.querySelectorAll('button[data-req-level]');
+upgradeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    createToast('Upgraded: ' + btn.innerText.trim());
+    triggerShake();
+  });
+});
+</script>
+
+<script>
+(() => {
+  const ids = ['upgrade-btn','auto-btn','tree-btn','orchard-btn','farmhand-btn'];
+  ids.forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      // Highlight glow
+      btn.classList.add('upgrade-highlight');
+      // Shake
+      btn.classList.add('shake-btn');
+      // Cleanup
+      setTimeout(() => {
+        btn.classList.remove('upgrade-highlight');
+        btn.classList.remove('shake-btn');
+      }, 600);
+
+      // Play upgrade sound
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+
+      // Confetti particles
+      const rect = btn.getBoundingClientRect();
+      const x = rect.left + rect.width/2;
+      const y = rect.top + rect.height/2;
+      if (typeof createColoredParticles === 'function') {
+        createColoredParticles(x, y);
+      } else if (typeof createParticles === 'function') {
+        createParticles(x, y);
+      } else {
+        for (let j = 0; j < 20; j++) {
+          const dot = document.createElement('span');
+          dot.className = 'celebration-dot';
+          dot.style.left = x + 'px';
+          dot.style.top = y + 'px';
+          document.body.appendChild(dot);
+          setTimeout(() => dot.remove(), 1400);
+        }
+      }
+    });
+  });
+})();
+</script>
+
+<!-- Tutorial Overlay -->
+<div id="tutorial-overlay">
+  <div id="tutorial-popup">
+    <p id="tutorial-message"></p>
+    <button id="tutorial-next">Next</button>
+    <button id="tutorial-skip">Skip</button>
+  </div>
+</div>
+
+<script>
+// Guided tutorial steps
+(function(){
+  const steps = [
+    { selector: '#tap-zone', message: 'This is where you tap to collect fruit! Tap here to get started.' },
+    { selector: 'button[data-req-level]', message: 'Here are your upgrades. Spend fruit to boost your click power.' },
+    { selector: '#prestige-btn', message: 'Prestige here to reset for multipliers and grow faster next time.' }
+  ];
+  if (localStorage.getItem('tutorialCompleted')) return;
+  let current = 0;
+  const overlay = document.getElementById('tutorial-overlay');
+  const popup = document.getElementById('tutorial-popup');
+  const msg = document.getElementById('tutorial-message');
+  const nextBtn = document.getElementById('tutorial-next');
+  const skipBtn = document.getElementById('tutorial-skip');
+
+  function showStep() {
+    const step = steps[current];
+    const el = document.querySelector(step.selector);
+    if (!el) return finish();
+    const rect = el.getBoundingClientRect();
+    msg.textContent = step.message;
+    popup.style.top = (rect.bottom + 10) + 'px';
+    popup.style.left = rect.left + 'px';
+    overlay.style.display = 'block';
+    document.querySelectorAll('.highlight-element').forEach(e => e.classList.remove('highlight-element'));
+    el.classList.add('highlight-element');
+  }
+
+  function nextStep() {
+    if (current >= steps.length) return finish();
+    showStep();
+    current++;
+  }
+
+  function finish() {
+    overlay.style.display = 'none';
+    document.querySelectorAll('.highlight-element').forEach(e => e.classList.remove('highlight-element'));
+    localStorage.setItem('tutorialCompleted', 'true');
+  }
+
+  nextBtn.addEventListener('click', () => {
+    nextStep();
+    if (current === steps.length) nextBtn.textContent = 'Finish';
+  });
+  skipBtn.addEventListener('click', finish);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    nextBtn.textContent = 'Next';
+    nextStep();
+  });
+})();
+</script>
+
+<script>
+// Ensure Prestige Shop button toggles the details panel
+document.addEventListener('DOMContentLoaded', () => {
+  const shopBtn = document.getElementById('prestige-shop-btn');
+  const details = document.getElementById('prestige-details');
+  if (shopBtn && details) {
+    shopBtn.addEventListener('click', () => {
+      details.open = !details.open;
+    });
+    // Also allow summary click to work
+    const summary = details.querySelector('summary');
+    if (summary) {
+      summary.style.cursor = 'pointer';
+    }
+  }
+});
+</script>
+
+<script>
+// Override showPrestigeShopButton to always show the button
+function showPrestigeShopButton() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (btn) btn.style.display = '';
+}
+// Bind correct onclick to openPrestigeShop, ensure button visible and clickable
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('prestige-shop-btn');
+  if (btn) {
+    // Ensure visible
+    btn.style.display = '';
+    // Bring to front
+    btn.style.zIndex = '10001';
+    btn.style.pointerEvents = 'auto';
+    // Remove existing onclick
+    btn.onclick = null;
+    // Bind to openPrestigeShop
+    if (typeof openPrestigeShop === 'function') {
+      btn.addEventListener('click', openPrestigeShop);
+    }
+  }
+});
+</script>
+
+<script>
+// Bind the single Prestige Shop button inside #prestige-container to the shop modal
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.querySelector('#prestige-container #prestige-shop-btn');
+  if (btn && typeof openPrestigeShop === 'function') {
+    btn.onclick = openPrestigeShop;
+  }
+});
+</script>
+
+
+<!-- Override renderPrestigeShop to ensure all upgrades display -->
+<script>
+(function(){
+  const origUpgrades = window.prestigeUpgrades || [];
+  window.renderPrestigeShop = function() {
+    const list = document.getElementById('prestige-shop-list');
+    const pts = (typeof getPrestigePoints === 'function') ? getPrestigePoints() : 0;
+    let html = `<div style="font-weight:bold;margin-bottom:8px;">Prestige Points: ${pts}</div>`;
+    origUpgrades.forEach(u => {
+      const owned = typeof u.getOwned === 'function' ? u.getOwned() : 0;
+      const ownedStr = owned > 0 ? ` (x${owned})` : '';
+      const canBuy = pts >= u.baseCost && owned < u.buyLimit;
+      html += `
+      <div style="margin-bottom:12px;padding:10px;border:1px solid #ddd;border-radius:8px;background:#f9f9f9;">
+        <b>${u.label}</b>${ownedStr}<br>
+        <span style="font-size:0.9em;color:#666;">${u.desc}</span><br>
+        <button onclick="prestigeBuyUpgrade('${u.id}')" ${!canBuy?'disabled':''}
+          style="margin-top:6px;padding:6px 12px;border:none;border-radius:6px;${canBuy?'background:#6e3baa;color:#fff;cursor:pointer;':'background:#ccc;color:#666;cursor:not-allowed;'}">
+          Buy (${u.baseCost})
+        </button>
+      </div>`;
+    });
+    if (list) list.innerHTML = html;
+  };
+})();
+</script>
+
+<!-- Consolidated Prestige Shop Logic Override -->
+<script>
+(function(){
+  const upgrades = [
+    { id: 'fruit_mult', label: 'Fruit Multiplier (+10%)', desc: 'All earnings increased by 10%. Stacks.', cost: 1, buyLimit: 100,
+      getOwned: () => Number(localStorage.getItem('prestige_fruit_mult')||'0'),
+      buy: function() {
+        let o = this.getOwned();
+        if(state.prestigeCount < this.cost || o >= this.buyLimit) return;
+        localStorage.setItem('prestige_fruit_mult', o+1);
+        state.prestigeCount -= this.cost;
+        save(); updateUI(); renderPrestigeShop();
+      }
+    },
+    { id: 'golden_freq', label: 'Golden Fruit x2', desc: 'Golden fruit appears twice as often.', cost: 3, buyLimit: 1,
+      getOwned: () => Number(localStorage.getItem('prestige_golden_freq')||'0'),
+      buy: function() {
+        let o = this.getOwned();
+        if(state.prestigeCount < this.cost || o >= this.buyLimit) return;
+        localStorage.setItem('prestige_golden_freq', 1);
+        state.prestigeCount -= this.cost;
+        save(); updateUI(); renderPrestigeShop();
+      }
+    },
+    { id: 'auto_boost', label: 'Auto-Harvest +20%', desc: 'Auto-harvest is 20% faster per upgrade.', cost: 5, buyLimit: 5,
+      getOwned: () => Number(localStorage.getItem('prestige_auto_boost')||'0'),
+      buy: function() {
+        let o = this.getOwned();
+        if(state.prestigeCount < this.cost || o >= this.buyLimit) return;
+        localStorage.setItem('prestige_auto_boost', o+1);
+        state.prestigeCount -= this.cost;
+        save(); updateUI(); renderPrestigeShop();
+      }
+    },
+    { id: 'prestige_saver', label: 'Prestige Saver', desc: '+1 free Prestige Point each prestige. One time.', cost: 7, buyLimit: 1,
+      getOwned: () => Number(localStorage.getItem('prestige_saver')||'0'),
+      buy: function() {
+        let o = this.getOwned();
+        if(state.prestigeCount < this.cost || o >= this.buyLimit) return;
+        localStorage.setItem('prestige_saver', 1);
+        state.prestigeCount -= this.cost;
+        save(); updateUI(); renderPrestigeShop();
+      }
+    },
+    { id: 'theme_unlock', label: 'Unlock Theme', desc: 'Unlocks a special background theme.', cost: 3, buyLimit: 1,
+      getOwned: () => Number(localStorage.getItem('prestige_theme')||'0'),
+      buy: function() {
+        let o = this.getOwned();
+        if(state.prestigeCount < this.cost || o >= this.buyLimit) return;
+        localStorage.setItem('prestige_theme', 1);
+        state.prestigeCount -= this.cost;
+        save(); updateUI(); renderPrestigeShop();
+        document.body.style.background = "#f8f4ff";
+      }
+    }
+  ];
+
+  function getPrestigePoints() {
+    return state.prestigeCount || 0;
+  }
+
+  window.renderPrestigeShop = function() {
+    const list = document.getElementById('prestige-shop-list');
+    let pts = getPrestigePoints();
+    let html = `<div style="font-weight:bold;text-align:center;">Prestige Points: ${pts}</div>`;
+    upgrades.forEach(u => {
+      const o = u.getOwned();
+      const ownedStr = o > 0 ? ` <span style="color:green;">(x${o})</span>` : '';
+      const canBuy = pts >= u.cost && o < u.buyLimit;
+      html += `<div style="margin:10px 0;padding:8px;border:1px solid #ddd;border-radius:8px;background:#f4f1fa;">
+        <strong>${u.label}${ownedStr}</strong><br><small>${u.desc}</small><br>
+        <button onclick="(function(){ const up=upgrades.find(x=>x.id==='${u.id}'); up.buy(); })()" ${canBuy?'':'disabled'}
+          style="margin-top:6px;padding:6px 12px;border:none;border-radius:6px;background:${canBuy?'#6e3baa':'#ccc'};color:#fff;cursor:${canBuy?'pointer':'not-allowed'};">
+          Buy (${u.cost})
+        </button>
+      </div>`;
+    });
+    list.innerHTML = html;
+  };
+
+  window.openPrestigeShop = function() {
+    document.getElementById('prestige-shop-modal').style.display = 'flex';
+    renderPrestigeShop();
+  };
+
+  window.closePrestigeShop = function() {
+    document.getElementById('prestige-shop-modal').style.display = 'none';
+  };
+
+  document.getElementById('prestige-shop-btn').addEventListener('click', openPrestigeShop);
+})();
+</script>
+
+
+<!-- Leaderboard Fix: use state.totalTaps -->
+<script>
+function renderLeaderboardFixed() {
+  const ol = document.getElementById('leaders');
+  if (!ol) return;
+  const name = localStorage.getItem('ftPlayer') || 'Anon';
+  const taps = state.totalTaps || 0;
+  let lb = JSON.parse(localStorage.getItem('ftLeaderboard')||'[]');
+  // Ensure current session is in list
+  lb = lb.filter(e => !(e.name===name && e.taps===taps)); // remove duplicates
+  lb.push({name, taps});
+  lb.sort((a,b)=>b.taps - a.taps);
+  localStorage.setItem('ftLeaderboard', JSON.stringify(lb));
+  ol.innerHTML = lb.slice(0,10).map((e,i)=>`<li>${i+1}. ${e.name}: ${e.taps}</li>`).join('');
+}
+// Bind save via Change Name button click
+document.addEventListener('DOMContentLoaded', () => {
+  renderLeaderboardFixed();
+  const btn = document.getElementById('change-name-btn');
+  if (btn) {
+    btn.onclick = () => {
+      const name = prompt('Enter your name:', localStorage.getItem('ftPlayer')||'Anon')||'Anon';
+      localStorage.setItem('ftPlayer', name);
+      renderLeaderboardFixed();
+    };
+  }
+});
+</script>
+
+<script>
+// Themes & Skins shop logic
+function updateThemeButtons() {
+    const themesList = [
+      {id:'dark', cost:2},
+      {id:'neon', cost:3}
+    ];
+    themesList.forEach(t => {
+      const btn = document.querySelector(`.theme-btn[data-theme="${t.id}"]`);
+      if (!btn) return;
+      const purchased = localStorage.getItem('selectedTheme') === t.id;
+      btn.disabled = purchased;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateThemeButtons();
+  const themes = [
+    {id:'dark', cls:'dark-mode', cost:2},
+    {id:'neon', cls:'neon-mode', cost:3},
+    {id:'forest', cls:'forest-mode', cost:4},
+    {id:'sunset', cls:'sunset-mode', cost:5}
+
+  ];
+  // Bind theme buttons
+  themes.forEach(t => {
+    const btn = document.querySelector(`.theme-btn[data-theme="${t.id}"]`);
+    if (!btn) return;
+    // Disable if already selected
+    const sel = localStorage.getItem('selectedTheme');
+    if (sel === t.id) btn.disabled = true;
+    btn.addEventListener('click', () => {
+      // Allow theme change regardless of prestige points
+      // state.prestigeCount -= t.cost;
+      save(); updateUI();
+      // Apply theme class
+      document.body.classList.remove(...themes.map(x=>x.cls));
+      document.body.classList.add(t.cls);
+      localStorage.setItem('selectedTheme', t.id);
+      updateThemeButtons();
+      // Disable purchased
+      btn.disabled = true;
+    });
+  });
+  // On load, apply saved theme
+  const saved = localStorage.getItem('selectedTheme');
+  const theme = themes.find(x => x.id === saved);
+  if (theme) document.body.classList.add(theme.cls);
+});
+</script>
+
+<script>
+// Theme tab show/hide
+document.addEventListener('DOMContentLoaded', () => {
+  const themeDiv = document.getElementById('themes');
+  ['tab-play', 'tab-achiev', 'tab-leader'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', () => {
+      themeDiv.style.display = 'none';
+    });
+  });
+  const themeBtn = document.getElementById('tab-themes');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      themeDiv.style.display = 'block';
+    });
+  }
+});
+</script>
+
+
+<!-- Updated Themes & Skins shop logic with gating and reset -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const themes = [
+    {id:'default', cls:'', cost:0},
+    {id:'dark',    cls:'dark-mode', cost:2},
+    {id:'neon',    cls:'neon-mode', cost:3},
+    {id:'forest', cls:'forest-mode', cost:4},
+    {id:'sunset', cls:'sunset-mode', cost:5}
+
+  ];
+  const shop = document.getElementById('theme-shop');
+  // Ensure Default Mode button exists
+  themes.forEach(t => {
+    if (!document.querySelector(`.theme-btn[data-theme="${t.id}"]`)) {
+      const btn = document.createElement('button');
+      btn.className = 'theme-btn';
+      btn.dataset.theme = t.id;
+      btn.dataset.cost = t.cost;
+      btn.textContent = t.id === 'default'
+        ? 'Normal Mode (Free)'
+        : `${t.id === 'dark' ? 'Dark Mode' : 'Neon Mode'} (Cost: ${t.cost})`;
+      shop.appendChild(btn);
+    }
+  });
+
+  // Click handlers
+  themes.forEach(t => {
+    const btn = document.querySelector(`.theme-btn[data-theme="${t.id}"]`);
+    btn.addEventListener('click', () => {
+      if (state.prestigeCount < t.cost) return;
+      state.prestigeCount -= t.cost;
+      save();
+      updateUI();
+      // Remove all theme classes
+      document.body.classList.remove('dark-mode','neon-mode','forest-mode','sunset-mode');
+      if (t.id !== 'default') {
+        document.body.classList.add(t.cls);
+        localStorage.setItem('selectedTheme', t.id);
+      } else {
+        localStorage.removeItem('selectedTheme');
+      }
+      updateThemeButtons();
+    });
+  });
+
+  // Update button states based on cost and purchase
+  function updateThemeButtons() {
+    const pts = state.prestigeCount || 0;
+    themes.forEach(t => {
+      const btn = document.querySelector(`.theme-btn[data-theme="${t.id}"]`);
+      const purchased = localStorage.getItem('selectedTheme') === t.id;
+      btn.disabled = (t.id !== 'default') && (pts < t.cost || purchased);
+    });
+  }
+
+  // Apply saved theme on load
+  const saved = localStorage.getItem('selectedTheme');
+  if (saved) {
+    const theme = themes.find(x => x.id === saved);
+    if (theme) document.body.classList.add(theme.cls);
+  }
+
+  updateThemeButtons();
+});
+</script>
+
+
+<div id="daily-toast"></div>
+<script>
+// Enhanced Daily Login Rewards: Welcome back toast +7-day streak bonuses
+(function(){
+  const toast = document.getElementById('daily-toast');
+  const today = new Date().toISOString().split('T')[0];
+  const last = localStorage.getItem('dailyLastClaim');
+  let streak = parseInt(localStorage.getItem('dailyStreak') || '0', 10);
+
+  if (last !== today) {
+    const yesterday = new Date(Date.now() - 864e5).toISOString().split('T')[0];
+    streak = (last === yesterday) ? streak + 1 : 1;
+    if (streak > 7) streak = 1; // reset after 7-day streak
+    localStorage.setItem('dailyStreak', streak);
+    localStorage.setItem('dailyLastClaim', today);
+
+    // Base reward and escalating bonus
+    const baseReward = 100;
+    const bonusPerDay = 20; // extra per streak day
+    const reward = baseReward + bonusPerDay * (streak - 1);
+
+    window.state.fruit = (window.state.fruit || 0) + reward;
+    save(); updateUI();
+
+    toast.textContent = `Welcome back! +${reward} coins (Day ${streak}/7)`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+})();
+</script>
+
+
+<div id="idle-overlay"></div>
+<div id="idle-modal">
+  <p id="idle-modal-msg"></p>
+  <button class="close-idle">Close</button>
+</div>
+<script>
+// Offline Earnings Modal: 5% of CPS per hour away
+(function(){
+  const overlay = document.getElementById('idle-overlay');
+  const modal = document.getElementById('idle-modal');
+  const msg = document.getElementById('idle-modal-msg');
+  const last = parseInt(localStorage.getItem('idleLast') || '0', 10);
+  const now = Date.now();
+  if (last && now > last) {
+    const elapsedHr = (now - last) / 3600000;
+    const cps = window.state.cps || 0;
+    const earned = Math.floor(cps * elapsedHr * 0.05);
+    if (earned > 0) {
+      window.state.fruit = (window.state.fruit || 0) + earned;
+      save(); updateUI();
+      msg.textContent = `Welcome back! You earned +${earned} coins for ${elapsedHr.toFixed(2)} hours away.`;
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+      document.querySelector('.close-idle').onclick = function() {
+        overlay.style.display = 'none';
+        modal.style.display = 'none';
+      };
+    }
+  }
+  localStorage.setItem('idleLast', now.toString());
+  window.addEventListener('beforeunload', function() {
+    localStorage.setItem('idleLast', Date.now().toString());
+  });
+})();
+</script>
+
+
+<!-- Hall of Fame Extension -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const prestBtn = document.getElementById('prestige-btn');
+  prestBtn && prestBtn.addEventListener('click', () => {
+    // Manage history
+    let history = JSON.parse(localStorage.getItem('prestigeHistory') || '[]');
+    const pts = state.prestigeCount || 0;
+    history.push(pts);
+    history.sort((a, b) => b - a);
+    history = history.slice(0, 5);
+    localStorage.setItem('prestigeHistory', JSON.stringify(history));
+    // Append Hall of Fame to summary modal
+    const content = document.getElementById('prestige-summary-content');
+    if (content) {
+      let hofHtml = '<h3>Prestige Hall of Fame</h3><ol>';
+      history.forEach(v => {
+        hofHtml += `<li>${v} Prestige Points</li>`;
+      });
+      hofHtml += '</ol>';
+      content.innerHTML = content.innerHTML + hofHtml;
+    }
+  });
+});
+</script>
+
+
+<!-- In-Game Notifications -->
+<script>
+// Request Notification permission and schedule a reminder if away >1h
+document.addEventListener('DOMContentLoaded', () => {
+  if ('Notification' in window && navigator.serviceWorker) {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        const last = parseInt(localStorage.getItem('idleLast')||'0', 10);
+        const now = Date.now();
+        const elapsedMs = now - last;
+        const oneHour = 3600000;
+        if (last && elapsedMs > oneHour) {
+          const cps = window.state.cps || 0;
+          const hoursAway = elapsedMs / oneHour;
+          const earned = Math.floor(cps * hoursAway * 0.05);
+          navigator.serviceWorker.getRegistration().then(reg => {
+            if (reg) {
+              reg.showNotification('Come back for your daily reward!', {
+                body: `You missed ${earned} coins while away.`,
+                tag: 'daily-reward',
+                renotify: true
+              });
+            }
+          });
+        }
+      }
+    });
+  }
+});
+</script>
+
+
+<!-- Animated Counters -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  function animateValue(el, start, end, duration = 600) {
+    const range = end - start;
+    const minInterval = 50;
+    const steps = Math.max(Math.floor(duration / minInterval), 1);
+    let currentStep = 0;
+    const stepTime = duration / steps;
+    const timer = setInterval(() => {
+      currentStep++;
+      const value = start + (range * (currentStep / steps));
+      if (el.id === 'coins' || el.id === 'prestige-count') {
+        el.textContent = Math.floor(value);
+      } else {
+        el.textContent = value.toFixed(1);
+      }
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        // ensure final accuracy
+        if (el.id === 'coins' || el.id === 'prestige-count') {
+          el.textContent = end;
+        } else {
+          el.textContent = end.toFixed(1);
+        }
+      }
+    }, stepTime);
+  }
+
+  const origUpdateUI = window.updateUI;
+  window.updateUI = function() {
+    const coinsEl = document.getElementById('coins');
+    const cpsEl = document.getElementById('cps');
+    const prestigeEl = document.getElementById('prestige-count');
+    const oldCoins = parseInt(coinsEl.textContent) || 0;
+    const oldCps = parseFloat(cpsEl.textContent.replace(/[^0-9\.]/g, '')) || 0;
+    const oldPrestige = parseInt(prestigeEl.textContent) || 0;
+
+    // call original UI update
+    origUpdateUI();
+
+    // animate transitions
+    animateValue(coinsEl, oldCoins, window.state.coins);
+    animateValue(cpsEl, oldCps, window.state.cps || 0);
+    animateValue(prestigeEl, oldPrestige, window.state.prestigeCount || 0);
+  };
+});
+</script>
+
+
+<script>
+// Add transition class to tab containers
+document.addEventListener('DOMContentLoaded', () => {
+  ['game','achievements','leaderboard','themes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add('container-content');
+      // Remove any inline display styles to allow transitions
+      el.style.display = '';
+    }
+  });
+});
 </script>
 
 </body>
+
 </html>
