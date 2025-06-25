@@ -1,0 +1,14 @@
+[
+   {
+      "relation": [
+         "delegate_permission/common.handle_all_urls"
+      ],
+      "target": {
+         "namespace": "android_app",
+         "package_name": "io.github.vietnamvet.twa",
+         "sha256_cert_fingerprints": [
+            "B7:23:85:95:67:CA:3E:44:E5:11:36:61:10:BB:26:C2:0B:22:F7:09:12:0C:35:75:3D:E9:E9:04:68:B2:A1:53"
+         ]
+      }
+   }
+]
