@@ -1,9 +1,32 @@
 {
+  "id": "/Fruit-Tapper/",
   "name": "Fruit Tapper",
-  "short_name": "FruitTapper",
+  "short_name": "FruitTap",
+  "description": "A simple, fun fruit tapping game.",
+  "lang": "en-US",
+  "dir": "auto",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#317EFB",
+  "categories": [
+    "games",
+    "arcade"
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-1.png",
+      "sizes": "640x360",
+      "type": "image/png"
+    },
+    {
+      "src": "screenshot-2.png",
+      "sizes": "360x640",
+      "type": "image/png"
+    }
+  ],
   "icons": [
     {
       "src": "icon-192.png",
@@ -16,7 +39,14 @@
       "type": "image/png"
     }
   ],
-  "gcm_sender_id": "103953800507",
-  "background_color": "#87CEEB",
-  "theme_color": "#87CEEB"
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "share_target": {
+    "action": ".",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text"
+    }
+  }
 }
