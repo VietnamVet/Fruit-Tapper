@@ -1,16 +1,19 @@
 
-// Demo background sync: fake /api/ POST queued
-function queueDemoPost() {
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.ready.then(reg => {
-      // Store failed post in localStorage (simulate IndexedDB for demo)
-      localStorage.setItem('sync_post', JSON.stringify({ url: '/api/demo', body: { foo: 'bar' } }));
-      reg.sync.register('sync-posts');
-    });
-  }
+// Fire a POST for background sync check
+fetch('/api/test', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ test: 1 })
+}).catch(()=>{});
+
+// Background sync registration
+if ('serviceWorker' in navigator && 'SyncManager' in window) {
+  navigator.serviceWorker.ready.then(sw => {
+    sw.sync.register('sync-posts');
+  });
 }
 
-// Demo periodic sync registration
+// Periodic sync registration
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(reg => {
     if ('periodicSync' in reg) {
@@ -19,7 +22,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Demo push registration (dummy key, safe for test)
+// Push registration
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(reg => {
     if ('PushManager' in window) {
@@ -37,6 +40,3 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
-
-// Run demo POST (background sync) on first load
-queueDemoPost();
