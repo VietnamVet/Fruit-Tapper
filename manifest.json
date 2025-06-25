@@ -1,29 +1,23 @@
 {
   "name": "Fruit Tapper",
   "short_name": "FruitTapper",
-  "start_url": ".",
+  "description": "A simple, fun fruit tapping game!",
+  "start_url": "./?utm_source=app",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#87CEEB",
   "theme_color": "#87CEEB",
-  "description": "A simple, fun fruit tapping game!",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "prefer_related_applications": true,
-  "share_target": {
-    "method": "GET",
-    "action": "https://vietnamvet.github.io/Fruit-Tapper/",
-    "params": {
-      "title": "Fruit tapper"
-    }
-  }
+  ]
 }
