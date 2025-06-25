@@ -56,5 +56,7 @@
       "text": "text"
     }
   },
-  "launch_handler": {}
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }
