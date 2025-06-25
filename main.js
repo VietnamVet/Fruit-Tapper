@@ -1,25 +1,5 @@
 
-// Demo background sync: fake /api/ POST queued
-function queueDemoPost() {
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.ready.then(reg => {
-      // Store failed post in localStorage (simulate IndexedDB for demo)
-      localStorage.setItem('sync_post', JSON.stringify({ url: '/api/demo', body: { foo: 'bar' } }));
-      reg.sync.register('sync-posts');
-    });
-  }
-}
-
-// Demo periodic sync registration
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.ready.then(reg => {
-    if ('periodicSync' in reg) {
-      reg.periodicSync.register('refresh-content', { minInterval: 24 * 60 * 60 * 1000 });
-    }
-  });
-}
-
-// Demo push registration (dummy key, safe for test)
+// Push registration for PWABuilder detection
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(reg => {
     if ('PushManager' in window) {
@@ -37,6 +17,3 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
-
-// Run demo POST (background sync) on first load
-queueDemoPost();
