@@ -82,3 +82,27 @@ const minutes        = Math.min(rawMinutes, maxIdleMinutes);
     })());
   }
 });
+
+
+// Periodic Background Sync handler
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'update-content') {
+    event.waitUntil(
+      // Add your update logic here
+      self.clients.matchAll().then(clients => {
+        return Promise.resolve();
+      })
+    );
+  }
+});
+
+// Push Notification handler
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Fruit Tapper';
+  const options = {
+    body: data.body || 'Check out new features!',
+    icon: 'icons/icon-192.png'
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
