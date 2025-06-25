@@ -17,5 +17,13 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "prefer_related_applications": true,
+  "share_target": {
+    "method": "GET",
+    "action": "https://vietnamvet.github.io/Fruit-Tapper/",
+    "params": {
+      "title": "Fruit tapper"
+    }
+  }
 }
