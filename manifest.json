@@ -7,6 +7,9 @@
   "dir": "auto",
   "start_url": ".",
   "scope": ".",
+  "scope_extensions": [
+    "https://vietnamvet.github.io/Fruit-Tapper/"
+  ],
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
@@ -39,6 +42,10 @@
       "type": "image/png"
     }
   ],
+  "permissions": [
+    "periodic-background-sync"
+  ],
+  "gcm_sender_id": "103953800507",
   "prefer_related_applications": false,
   "related_applications": [],
   "share_target": {
