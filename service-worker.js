@@ -1,3 +1,29 @@
+
+const CACHE_NAME = 'fruit-tapper-cache-v1';
+const PRECACHE_URLS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_URLS))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(resp => resp || fetch(event.request))
+  );
+});
+
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
 const { precaching, routing, strategies, core, expiration } = workbox;
 core.skipWaiting();
@@ -81,28 +107,4 @@ const minutes        = Math.min(rawMinutes, maxIdleMinutes);
       await idb.set('lastActive', now);
     })());
   }
-});
-
-
-// Periodic Background Sync handler
-self.addEventListener('periodicsync', event => {
-  if (event.tag === 'update-content') {
-    event.waitUntil(
-      // Add your update logic here
-      self.clients.matchAll().then(clients => {
-        return Promise.resolve();
-      })
-    );
-  }
-});
-
-// Push Notification handler
-self.addEventListener('push', event => {
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || 'Fruit Tapper';
-  const options = {
-    body: data.body || 'Check out new features!',
-    icon: 'icons/icon-192.png'
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
 });

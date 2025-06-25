@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en" lang="en-US">
+<html lang="en-US">
 <head>
 <!-- DAILY_REWARDS_CSS -->
 <style>
@@ -3622,14 +3622,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+    navigator.serviceWorker.register('service-worker.js')
+      .catch(err => console.error('SW registration failed:', err));
   });
 }
 </script>
-
 </body>
 </html>

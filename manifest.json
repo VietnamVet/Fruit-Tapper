@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "lang": "en-US",
   "name": "Fruit Tapper",
   "short_name": "FruitTapper",
@@ -11,7 +12,7 @@
     }
   ],
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "background_color": "#87CEEB",
   "theme_color": "#87CEEB",
   "icons": [
@@ -26,6 +27,13 @@
       "type": "image/png"
     }
   ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot-1.png",
+      "sizes": "512x256",
+      "type": "image/png"
+    }
+  ],
   "related_applications": [
     {
       "platform": "play",
@@ -34,6 +42,12 @@
     }
   ],
   "prefer_related_applications": false,
+  "categories": [
+    "game"
+  ],
+  "dir": "ltr",
+  "iarc_rating_id": "TBD",
+  "launch_handler": {},
   "file_handlers": [
     {
       "action": "/?open_file=%s",
@@ -75,12 +89,5 @@
         }
       ]
     }
-  ],
-  "edge_side_panel": {
-    "default_path": "/",
-    "preferred_width": 400
-  },
-  "periodic_background_sync": {
-    "min_interval": 86400
-  }
+  ]
 }
