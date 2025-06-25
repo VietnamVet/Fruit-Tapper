@@ -22,3 +22,20 @@ self.addEventListener('fetch', event => {
   }
   event.respondWith(caches.match(event.request).then(r => r || fetch(event.request)));
 });
+
+// Background Sync for /api/ POSTs
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-posts') {
+    event.waitUntil(
+      // You would replay your POST requests here, e.g., from IndexedDB
+      Promise.resolve()
+    );
+  }
+});
+
+// Periodic Sync for background update
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'refresh-content') {
+    event.waitUntil(fetch('/api/latest-data'));
+  }
+});
