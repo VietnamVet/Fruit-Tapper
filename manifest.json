@@ -55,5 +55,6 @@
       "title": "title",
       "text": "text"
     }
-  }
+  },
+  "launch_handler": {}
 }
