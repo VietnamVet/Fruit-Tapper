@@ -1,25 +1,7 @@
 
-// Demo background sync: fake /api/ POST queued
-function queueDemoPost() {
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.ready.then(reg => {
-      // Store failed post in localStorage (simulate IndexedDB for demo)
-      localStorage.setItem('sync_post', JSON.stringify({ url: '/api/demo', body: { foo: 'bar' } }));
-      reg.sync.register('sync-posts');
-    });
-  }
-}
+// --- Your original game/app code here ---
 
-// Demo periodic sync registration
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.ready.then(reg => {
-    if ('periodicSync' in reg) {
-      reg.periodicSync.register('refresh-content', { minInterval: 24 * 60 * 60 * 1000 });
-    }
-  });
-}
-
-// Demo push registration (dummy key, safe for test)
+// --- PUSH NOTIFICATION REGISTRATION ---
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(reg => {
     if ('PushManager' in window) {
@@ -33,10 +15,14 @@ if ('serviceWorker' in navigator) {
       reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(base64)
+      }).then(sub => {
+        // Send subscription to backend
+        fetch('http://localhost:3000/api/save-subscription', {
+          method: 'POST',
+          body: JSON.stringify(sub),
+          headers: { 'Content-Type': 'application/json' }
+        });
       }).catch(()=>{});
     }
   });
 }
-
-// Run demo POST (background sync) on first load
-queueDemoPost();

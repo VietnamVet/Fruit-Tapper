@@ -46,3 +46,28 @@ self.addEventListener('fetch', (event) => {
     })());
   }
 });
+
+// --- PUSH NOTIFICATION HANDLING ---
+self.addEventListener('push', event => {
+  let data = {};
+  try {
+    data = event.data.json();
+  } catch (e) {}
+  const title = data.title || "Fruit Tapper 🍎";
+  const options = {
+    body: data.body || "You have a new notification!",
+    icon: 'icon-192.png',
+    badge: 'icon-192.png',
+    data: data.url || '/'
+  };
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data)
+  );
+});
