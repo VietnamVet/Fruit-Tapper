@@ -71,3 +71,25 @@ self.addEventListener('notificationclick', function(event) {
     clients.openWindow(event.notification.data)
   );
 });
+
+
+
+// --- Background Sync Example ---
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-taps') {
+    event.waitUntil(syncTaps());
+  }
+});
+async function syncTaps() {
+  // Placeholder for queued tap sync
+}
+
+// --- Periodic Sync Example ---
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'update-game-data') {
+    event.waitUntil(updateGameData());
+  }
+});
+async function updateGameData() {
+  // Placeholder for periodic update (fetch data, etc.)
+}

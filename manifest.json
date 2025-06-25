@@ -8,7 +8,10 @@
   "start_url": ".",
   "scope": ".",
   "scope_extensions": [
-    "https://vietnamvet.github.io/Fruit-Tapper/"
+    {
+      "origin": "https://vietnamvet.github.io",
+      "path": "/Fruit-Tapper/"
+    }
   ],
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -20,14 +23,29 @@
   ],
   "screenshots": [
     {
-      "src": "screenshot-1.png",
-      "sizes": "640x360",
-      "type": "image/png"
+      "src": "https://vietnamvet.github.io/Fruit-Tapper/Screenshot_20250624_210100_Chrome.jpg",
+      "sizes": "360x800",
+      "type": "image/jpeg"
     },
     {
-      "src": "screenshot-2.png",
-      "sizes": "360x640",
-      "type": "image/png"
+      "src": "https://vietnamvet.github.io/Fruit-Tapper/Screenshot_20250624_210103_Chrome.jpg",
+      "sizes": "360x800",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://vietnamvet.github.io/Fruit-Tapper/Screenshot_20250624_210104_Chrome.jpg",
+      "sizes": "360x800",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://vietnamvet.github.io/Fruit-Tapper/Screenshot_20250624_210110_Chrome.jpg",
+      "sizes": "360x800",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://vietnamvet.github.io/Fruit-Tapper/Screenshot_20250624_210114_Chrome.jpg",
+      "sizes": "360x800",
+      "type": "image/jpeg"
     }
   ],
   "icons": [

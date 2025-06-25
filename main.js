@@ -26,3 +26,14 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+
+
+
+// --- Register Periodic Sync (optional, helps PWA test) ---
+if ('serviceWorker' in navigator && 'periodicSync' in navigator.serviceWorker) {
+  navigator.serviceWorker.ready.then(swReg => {
+    swReg.periodicSync.register('update-game-data', {
+      minInterval: 24 * 60 * 60 * 1000 // Once per day
+    });
+  });
+}
