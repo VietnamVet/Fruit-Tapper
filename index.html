@@ -3622,13 +3622,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-      .catch(err => console.error('SW registration failed:', err));
+  window.addEventListener('load', async () => {
+    const reg = await navigator.serviceWorker.register('service-worker.js');
+    // Background Sync
+    if (reg.sync) {
+      reg.sync.register('sync-content');
+    }
+    // Periodic Sync (1 day)
+    if (reg.periodicSync) {
+      reg.periodicSync.register({tag: 'update-content', minInterval: 24 * 60 * 60 * 1000});
+    }
   });
 }
 </script>
+
 </body>
 </html>

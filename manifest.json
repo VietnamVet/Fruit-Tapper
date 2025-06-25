@@ -47,7 +47,13 @@
   ],
   "dir": "ltr",
   "iarc_rating_id": "TBD",
-  "launch_handler": {},
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "gcm_sender_id": "103953800507",
+  "periodic_background_sync": {
+    "min_interval": 86400
+  },
   "file_handlers": [
     {
       "action": "/?open_file=%s",
