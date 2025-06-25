@@ -50,3 +50,35 @@ self.addEventListener('message', (evt) => {
     core.skipWaiting();
   }
 });
+
+// Push Notification Handler
+self.addEventListener('push', event => {
+  const data = event.data?.json() || { title: 'Fruit Tapper', body: 'Time to tap some fruit!' };
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+    })
+  );
+});
+
+// Background Sync for Idle Earnings
+self.addEventListener('sync', event => {
+  if (event.tag === 'idle-earnings') {
+    event.waitUntil((async () => {
+      const last = await idb.get('lastActive') || Date.now();
+      const now = Date.now();
+      // Cap to at most 60 minutes of idle time
+const maxIdleMinutes = 2000;  // allows up to 2000 min * 5 coins/min = 10000 coins
+const rawMinutes     = Math.floor((now - last) / 60000);
+const minutes        = Math.min(rawMinutes, maxIdleMinutes);
+      const amount = minutes * 5;
+      const clients = await self.clients.matchAll();
+      for (const client of clients) {
+        client.postMessage({ type: 'IDLE_EARN', amount });
+      }
+      await idb.set('lastActive', now);
+    })());
+  }
+});

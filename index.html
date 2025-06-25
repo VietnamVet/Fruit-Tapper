@@ -1,12 +1,34 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#87CEEB">
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-  <title>Fruit T🍎pper</title>
-  <style>
+<!-- DAILY_REWARDS_CSS -->
+<style>
+#daily-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+#daily-toast.show {
+  opacity: 1;
+}
+</style>
+
+<link href="manifest.json" rel="manifest"/>
+<meta content="#87CEEB" name="theme-color"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<title>Fruit T🍎pper</title>
+<style>
     html, body { overscroll-behavior: none; margin: 0; padding: 0; }
     body { background: #87CEEB; font-family: sans-serif; display: flex; justify-content: center; align-items: start; height: 100vh; overflow: hidden; }
     .container { width: 360px; margin: 20px 0; position: relative; }
@@ -477,8 +499,6 @@
   animation: screenShake 0.4s ease-in-out;
 }
 </style>
-
-
 <style>
 /* Tutorial overlay styles */
 #tutorial-overlay {
@@ -508,7 +528,6 @@
   box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.9);
 }
 </style>
-
 <style>
 /* Themes & Skins CSS */
 .dark-mode { background: #222 !important; color: #eee !important; }
@@ -520,7 +539,6 @@
 .theme-btn { padding: 8px 14px; border:none; border-radius:6px; cursor:pointer; background:#6e3baa; color:#fff; }
 .theme-btn:disabled { background:#888; cursor:not-allowed; }
 </style>
-
 <style>
 /* Daily Reward Toast */
 #daily-toast {
@@ -547,8 +565,6 @@
   100% { opacity: 0; }
 }
 </style>
-
-
 <style>
 /* Offline Reward Toast */
 #idle-toast {
@@ -575,8 +591,6 @@
   100% { opacity: 0; }
 }
 </style>
-
-
 <style>
 /* Additional Themes */
 .forest-mode { background: #e8ffe8 !important; color: #055005 !important; }
@@ -586,14 +600,12 @@
 .sunset-mode .container { background: #ffe4b5 !important; }
 .sunset-mode #fruit-btn img { filter: hue-rotate(-30deg) brightness(1.2); }
 </style>
-
 <style>
 #theme-shop .theme-btn {
   max-width: 300px;
   margin: 0 auto;
 }
 </style>
-
 <style>
 /* Enhanced Daily Login Rewards Toast */
 #daily-toast {
@@ -619,7 +631,6 @@
   100% { opacity: 0; transform: translateY(-20px); }
 }
 </style>
-
 <style>
 /* Offline Earnings Modal */
 #idle-overlay {
@@ -646,8 +657,6 @@
   color: #fff; cursor: pointer;
 }
 </style>
-
-
 <style>
 /* Screen Transitions for Tab Content */
 #game, #achievements, #leaderboard, #themes {
@@ -664,8 +673,6 @@
   opacity: 1;
 }
 </style>
-
-
 <style>
 /* Lottie-style fruit spin animation */
 @keyframes spinFruit {
@@ -680,7 +687,6 @@
   margin-right: 8px;
 }
 </style>
-
 <style>
 /* Hide coin elements when not on Play tab */
 .container-content:not(#game):not(.active) #coins,
@@ -689,19 +695,13 @@
   visibility: hidden !important;
 }
 </style>
-
-
 <style>
 /* Hide entire game container (coins, cps, upgrades) unless Play tab is active */
 #game { display: none !important; }
 #game.active { display: block !important; }
 </style>
-
-
 <style>
 </style>
-
-
 <style>
 #prestige-shop-modal .fly-coin,
 #prestige-shop-modal #gold-bar,
@@ -709,8 +709,6 @@
   visibility: hidden !important;
 }
 </style>
-
-
 <style>
 #prestige-shop-modal .fly-coin,
 #prestige-shop-modal .coin-effect,
@@ -725,7 +723,6 @@
   visibility: hidden !important;
 }
 </style>
-
 <style>
 /* Hide header coin UI and floating coins when Prestige Shop is open */
 body.prestige-open #gold-bar,
@@ -735,98 +732,211 @@ body.prestige-open .fly-coin {
   display: none !important;
 }
 </style>
+<style>
+@keyframes prestigeGlow {
+  0%, 100% {
+    box-shadow: 0 0 6px 2px gold;
+    transform: scale(1);
+    background-color: #E91E63;
+    filter: drop-shadow(0 0 4px gold);
+  }
+  50% {
+    box-shadow: 0 0 18px 8px #ffd700cc;
+    transform: scale(1.1);
+    background-color: #FFD700;
+    filter: drop-shadow(0 0 10px #ffd700cc);
+  }
+}
 
+@keyframes shadowFlicker {
+  0%, 100% { box-shadow: 0 0 6px 2px gold; }
+  50% { box-shadow: 0 0 22px 10px #fff9aa; }
+}
+
+@keyframes prestigePeriodicShake {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(2px, -2px) scale(1.05); }
+}
+
+#prestige-btn.pulse {
+  animation: prestigeGlow 2.5s ease-in-out infinite, shadowFlicker 1.5s ease-in-out infinite;
+  position: relative;
+  z-index: 10;
+  transition: background-color 0.3s ease;
+}
+
+#prestige-btn.pulse.shake {
+  animation: prestigeGlow 2.5s ease-in-out infinite, shadowFlicker 1.5s ease-in-out infinite, prestigePeriodicShake 0.5s ease-in-out;
+}
+</style>
+</meta>    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js">
+// Additional pause handlers for PWA or tab closing
+window.addEventListener('pagehide', () => bg.pause());
+window.addEventListener('beforeunload', () => bg.pause());
+
+// Leaderboard functionality
+const leaderboardButton = document.getElementById('leaderboard-button');
+const leaderboardModal = document.getElementById('leaderboard-modal');
+const closeLb = document.getElementById('close-leaderboard');
+const lbList = document.getElementById('leaderboard-list');
+leaderboardButton.addEventListener('click', async () => {
+  lbList.innerHTML = '<li>Loading...</li>';
+  try {
+    const resp = await fetch('https://example.com/api/leaderboard');
+    const data = await resp.json();
+    lbList.innerHTML = '';
+    data.forEach(entry => {
+      const li = document.createElement('li');
+      li.textContent = `${entry.name}: ${entry.score}`;
+      lbList.appendChild(li);
+    });
+  } catch (e) {
+    lbList.innerHTML = '<li>Error loading leaderboard</li>';
+  }
+  leaderboardModal.style.display = 'block';
+});
+closeLb.addEventListener('click', () => leaderboardModal.style.display = 'none');
+
+// Social sharing
+const shareButton = document.getElementById('share-button');
+shareButton.addEventListener('click', () => {
+  const text = `I just scored ${state.coins} coins in Fruit Tapper! Can you beat my score?`;
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: 'My Fruit Tapper Score', text, url });
+  } else {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+      '_blank'
+    );
+  }
+});
+</script>
+
+<!-- Popper.js (peer dep) -->
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<!-- Tippy.js -->
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
+<script src="https://unpkg.com/tippy.js@6"></script>
+
+
+<!-- TOAST_SIZE_FIX -->
+<style>
+#daily-toast {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: 80vw !important;
+  padding: 12px 16px !important;
+  border-radius: 6px !important;
+  background: #ff9800 !important;
+  color: #fff !important;
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  left: unset !important;
+  bottom: unset !important;
+  transform: none !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  z-index: 2001 !important;
+}
+#daily-toast.show {
+  display: inline-block !important;
+  animation: fadeInOut 4s ease-out forwards !important;
+}
+</style>
 </head>
 <body>
+  <button id="install-btn" style="display:none;position:fixed;bottom:1rem;right:1rem;z-index:1000;">Install Fruit Tapper</button>
 <!-- Prestige Shop Modal -->
 <div id="prestige-shop-modal" style="
     display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;
     background:rgba(24,12,48,0.55);z-index:10000;justify-content:center;align-items:center;">
-  <div style="background:#fff;border-radius:16px;max-width:330px;width:92vw;padding:18px 12px 10px 12px;box-shadow:0 4px 30px #0008;position:relative;display:flex;flex-direction:column;align-items:center;">
-    <h2 style="color:#6e3baa;font-weight:bold;margin:0 0 8px 0;font-size:1.4em;letter-spacing:0.01em;">🏆 Prestige Shop</h2>
-    <div id="prestige-shop-list" style="width:100%;margin:10px 0;"></div>
-    <button onclick="closePrestigeShop()" style="margin-top:16px;background:#eee;border:none;padding:8px 28px;font-size:1.08em;border-radius:14px;color:#222;font-weight:bold;">Close</button>
-  </div>
+<div style="background:#fff;border-radius:16px;max-width:330px;width:92vw;padding:18px 12px 10px 12px;box-shadow:0 4px 30px #0008;position:relative;display:flex;flex-direction:column;align-items:center;">
+<h2 style="color:#6e3baa;font-weight:bold;margin:0 0 8px 0;font-size:1.4em;letter-spacing:0.01em;">🏆 Prestige Shop</h2>
+<div id="prestige-shop-list" style="width:100%;margin:10px 0;"></div>
+<button onclick="closePrestigeShop()" style="margin-top:16px;background:#eee;border:none;padding:8px 28px;font-size:1.08em;border-radius:14px;color:#222;font-weight:bold;">Close</button>
+</div>
 </div>
 <div class="bg-clouds">
-  <svg class="cloud c1" id="cloud1" style="top:22vh; left:-140px;" width="120" height="60" viewBox="0 0 120 60"><ellipse cx="40" cy="40" rx="36" ry="20" fill="#fff" opacity="0.85"/><ellipse cx="74" cy="28" rx="29" ry="18" fill="#fff" opacity="0.73"/><ellipse cx="85" cy="44" rx="22" ry="14" fill="#fff" opacity="0.8"/></svg>
-  <svg class="cloud c2" id="cloud2" style="top:9vh; left:-240px;" width="170" height="80" viewBox="0 0 170 80"><ellipse cx="50" cy="55" rx="46" ry="23" fill="#fff" opacity="0.82"/><ellipse cx="105" cy="35" rx="37" ry="19" fill="#fff" opacity="0.74"/><ellipse cx="135" cy="62" rx="28" ry="13" fill="#fff" opacity="0.7"/></svg>
-  <svg class="cloud c3" id="cloud3" style="top:41vh; left:-100px;" width="90" height="45" viewBox="0 0 90 45"><ellipse cx="26" cy="25" rx="20" ry="11" fill="#fff" opacity="0.9"/><ellipse cx="58" cy="16" rx="18" ry="9" fill="#fff" opacity="0.74"/><ellipse cx="70" cy="28" rx="14" ry="7" fill="#fff" opacity="0.75"/></svg>
-  <svg class="cloud c4" id="cloud4" style="top:70vh; left:-220px;" width="200" height="100" viewBox="0 0 200 100"><ellipse cx="70" cy="80" rx="54" ry="25" fill="#fff" opacity="0.76"/><ellipse cx="150" cy="45" rx="38" ry="22" fill="#fff" opacity="0.69"/><ellipse cx="170" cy="82" rx="29" ry="15" fill="#fff" opacity="0.7"/></svg>
+<svg class="cloud c1" height="60" id="cloud1" style="top:22vh; left:-140px;" viewbox="0 0 120 60" width="120"><ellipse cx="40" cy="40" fill="#fff" opacity="0.85" rx="36" ry="20"></ellipse><ellipse cx="74" cy="28" fill="#fff" opacity="0.73" rx="29" ry="18"></ellipse><ellipse cx="85" cy="44" fill="#fff" opacity="0.8" rx="22" ry="14"></ellipse></svg>
+<svg class="cloud c2" height="80" id="cloud2" style="top:9vh; left:-240px;" viewbox="0 0 170 80" width="170"><ellipse cx="50" cy="55" fill="#fff" opacity="0.82" rx="46" ry="23"></ellipse><ellipse cx="105" cy="35" fill="#fff" opacity="0.74" rx="37" ry="19"></ellipse><ellipse cx="135" cy="62" fill="#fff" opacity="0.7" rx="28" ry="13"></ellipse></svg>
+<svg class="cloud c3" height="45" id="cloud3" style="top:41vh; left:-100px;" viewbox="0 0 90 45" width="90"><ellipse cx="26" cy="25" fill="#fff" opacity="0.9" rx="20" ry="11"></ellipse><ellipse cx="58" cy="16" fill="#fff" opacity="0.74" rx="18" ry="9"></ellipse><ellipse cx="70" cy="28" fill="#fff" opacity="0.75" rx="14" ry="7"></ellipse></svg>
+<svg class="cloud c4" height="100" id="cloud4" style="top:70vh; left:-220px;" viewbox="0 0 200 100" width="200"><ellipse cx="70" cy="80" fill="#fff" opacity="0.76" rx="54" ry="25"></ellipse><ellipse cx="150" cy="45" fill="#fff" opacity="0.69" rx="38" ry="22"></ellipse><ellipse cx="170" cy="82" fill="#fff" opacity="0.7" rx="29" ry="15"></ellipse></svg>
 </div>
-
-  <audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop autoplay></audio>
-  <div class="container">
-    <div id="title"><svg class="lottie-fruit" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="60" r="30" fill="#ff4d4d"/>
-  <path d="M50 30 C45 20, 60 20, 55 30 Z" fill="#228B22"/>
+<audio autoplay="" id="bg-music" loop="" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+<div class="container">
+<div id="title"><svg class="lottie-fruit" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="60" fill="#ff4d4d" r="30"></circle>
+<path d="M50 30 C45 20, 60 20, 55 30 Z" fill="#228B22"></path>
 </svg>Fruit T🍎pper</div>
-    <button id="mute-btn">🔊</button><button id="reset-btn">🔄</button>
-    <div id="tabs">
-      <button id="tab-play" class="tab-btn active">Play</button>
-      <button id="tab-achiev" class="tab-btn">Achievements</button>
-      <button id="tab-leader" class="tab-btn">Leaderboard</button>
-      <button id="tab-themes" class="tab-btn">Themes</button>
-    </div>
-    <div id="game" class="active">
-      <div id="prestige-container">Prestige Count: <span id="prestige-count">0</span><br/><button id="prestige-btn" disabled>Prestige (Lv20+)</button>
+<button id="mute-btn">🔊</button><button id="reset-btn">🔄</button>
+<div id="tabs">
+<button class="tab-btn active" id="tab-play">Play</button>
+<button class="tab-btn" id="tab-achiev">Achievements</button>
+<button class="tab-btn" id="tab-leader">Leaderboard</button>
+<button class="tab-btn" id="tab-themes">Themes</button>
+</div>
+<div class="active" id="game">
+<div id="prestige-container">Prestige Count: <span id="prestige-count">0</span><br/><button disabled="" id="prestige-btn">Prestige (Lv20+)</button>
 <button id="prestige-shop-btn" style="margin-left:10px;padding:6px 12px;background:#ffd700;color:#000;border:none;border-radius:4px;cursor:pointer;;z-index:10001;pointer-events:auto">
   Prestige Shop
 </button>
-
 </div>
-      <div id="level-container"><div id="level-text">Level: <span id="level">1</span></div><div id="level-bar"><div id="level-fill"></div></div></div>
-      <div id="tap-zone"><button id="fruit-btn"><img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f34e.png" alt="Apple"/></button><div id="golden-fruit"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f34e.png" style="filter:brightness(2) saturate(2) hue-rotate(-33deg);" alt="Golden Apple"/></div></div>
-
-    <div id="bar-row" style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 0 0;">
-      <div id="gold-bar" style="flex:1;"><span id="coins">0</span>🟡</div>
-      <div id="cps" style="font-size:1.02em; color:#555; margin-left:16px; text-align:right; white-space:nowrap;"></div>
-    </div>
-    <button id="upgrade-btn" class="action-btn" data-req-level="1">
+<div id="level-container"><div id="level-text">Level: <span id="level">1</span></div><div id="level-bar"><div id="level-fill"></div></div></div>
+<div id="tap-zone"><button id="fruit-btn"><div class="slide-wrapper"><img alt="Apple" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f34e.png"/></div></button><div id="golden-fruit"><img alt="Golden Apple" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f34e.png" style="filter:brightness(2) saturate(2) hue-rotate(-33deg);"/></div></div>
+<div id="bar-row" style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 0 0;">
+<div id="gold-bar" style="flex:1;"><span id="coins">0</span>🟡</div>
+<div id="cps" style="font-size:1.02em; color:#555; margin-left:16px; text-align:right; white-space:nowrap;"></div>
+</div>
+<button class="action-btn" data-req-level="1" id="upgrade-btn">
         Upgrade +<span id="clickValue">1</span> (<span id="upgrade-cost">10</span>🟡)
         <span class="req-text">Lv1</span>
-      </button>
-      <button id="auto-btn" class="action-btn" data-req-level="5">
+</button>
+<button class="action-btn" data-req-level="5" id="auto-btn">
         Auto-Harvest (+<span id="autoPower">2</span>/sec) (<span id="auto-cost">100</span>🟡)
         <span class="req-text">Lv5</span>
-      </button>
-      <button id="tree-btn" class="action-btn" data-req-level="10">
+</button>
+<button class="action-btn" data-req-level="10" id="tree-btn">
         Cherry Tree (+5/sec) (<span id="tree-cost">200</span>🟡)
         <span class="req-text">Lv10</span>
-      </button>
-      <button id="orchard-btn" class="action-btn" data-req-level="15">
+</button>
+<button class="action-btn" data-req-level="15" id="orchard-btn">
         Orchard (+10/sec) (<span id="orchard-cost">500</span>🟡)
         <span class="req-text">Lv15</span>
-      </button>
-      <button id="farmhand-btn" class="action-btn" data-req-level="20">
+</button>
+<button class="action-btn" data-req-level="20" id="farmhand-btn">
         Farmhand (+20/sec) (<span id="farmhand-cost">1000</span>🟡)
         <span class="req-text">Lv20</span>
-      </button>
-    </div>
-    <div id="achievements"><h2>Achievements</h2><ol id="achiev-list"></ol></div>
-    <div id="leaderboard">
-  <h2>Leaderboard</h2>
-  <button id="change-name-btn" style="margin-bottom:10px;">Change Name</button>
-  <ol id="leaders"></ol>
+</button>
 </div>
-  
-    <div id="themes" class="tab-content" style="display:none">
-      <h2>Themes & Skins</h2>
-      
-<div id="theme-shop" style="display:flex; flex-direction:column; gap:12px; padding:16px;">
-  <button class="theme-btn" data-theme="default" data-cost="0" style="width:100%;">Normal Mode (Free)</button>
-  <button class="theme-btn" data-theme="dark" data-cost="2" style="width:100%;">Dark Mode (Cost: 2)</button>
-  <button class="theme-btn" data-theme="neon" data-cost="3" style="width:100%;">Neon Mode (Cost: 3)</button>
-  <button class="theme-btn" data-theme="forest" data-cost="4" style="width:100%;">Forest Mode (Cost: 4)</button>
-  <button class="theme-btn" data-theme="sunset" data-cost="5" style="width:100%;">Sunset Mode (Cost: 5)</button>
-</div>
+<div id="achievements"><h2>Achievements</h2><ol id="achiev-list"></ol></div>
+<div id="leaderboard">
 
-        <div style="margin:12px 0;">
-          </div>
-      </div>
-    </div>
+  <!-- Leaderboard & Share UI -->
+  <div id="social-leaderboard-container" style="margin: 1em 0; display: flex; gap: 0.5em;">
+    <button id="leaderboard-button">View Global Leaderboard</button>
+    <button id="share-button">Share My Score</button>
+  </div>
+
+<h2>Leaderboard</h2>
+<button id="change-name-btn" style="margin-bottom:10px;">Change Name</button>
+<ol id="leaders"></ol>
 </div>
-  <script>
+<div class="tab-content" id="themes" style="display:none">
+<h2>Themes &amp; Skins</h2>
+<div id="theme-shop" style="display:flex; flex-direction:column; gap:12px; padding:16px;">
+<button class="theme-btn" data-cost="0" data-theme="default" style="width:100%;">Normal Mode (Free)</button>
+<button class="theme-btn" data-cost="2" data-theme="dark" style="width:100%;">Dark Mode (Cost: 2)</button>
+<button class="theme-btn" data-cost="3" data-theme="neon" style="width:100%;">Neon Mode (Cost: 3)</button>
+<button class="theme-btn" data-cost="4" data-theme="forest" style="width:100%;">Forest Mode (Cost: 4)</button>
+<button class="theme-btn" data-cost="5" data-theme="sunset" style="width:100%;">Sunset Mode (Cost: 5)</button>
+</div>
+<div style="margin:12px 0;">
+</div>
+</div>
+</div>
+<script>
     document.body.addEventListener('touchmove', e => e.preventDefault(), { passive:false });
 
     const tabMap={'tab-play':'game','tab-achiev':'achievements','tab-leader':'leaderboard', 'tab-themes':'themes'};
@@ -841,11 +951,30 @@ body.prestige-open .fly-coin {
 
     const ctx=new (window.AudioContext||window.webkitAudioContext)(),
           bg=document.getElementById('bg-music');
-    let tapBuf, purBuf, muted=false;
+    
+// Auto-pause music when page is hidden
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    bg.pause();
+  }
+});
+// Pause on pagehide and beforeunload
+window.addEventListener('pagehide', () => bg.pause());
+window.addEventListener('beforeunload', () => bg.pause());
+let tapBuf, purBuf, muted=false;
     function loadSound(url,cb){fetch(url).then(r=>r.arrayBuffer()).then(d=>ctx.decodeAudioData(d,buf=>cb(buf))); }
     loadSound('https://actions.google.com/sounds/v1/cartoon/pop.ogg',b=>tapBuf=b);
     loadSound('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg',b=>purBuf=b);
     function playSound(buf){ if(ctx.state==='suspended')ctx.resume(); if(!buf||muted) return; const s=ctx.createBufferSource(); s.buffer=buf; s.connect(ctx.destination); s.start(); }
+
+    // Play level-up sound using the preloaded buffer
+    function playLevelUpSound() {
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+        playSound(purBuf);
+    }
+
 
     let state=JSON.parse(localStorage.getItem('ftState')||'{"coins":0,"clickValue":1,"upgradeCost":10,"autoCost":100,"treeCost":200,"orchardCost":500,"farmhandCost":1000,"autoHarvest":false,"autoPower":2,"trees":0,"orchards":0,"farmhands":0,"prestigeCount":0,"totalTaps":0,"achievements":{},"level":1,"progress":0}'),
         coinsEl=document.getElementById('coins'),
@@ -1005,42 +1134,49 @@ const MILESTONES = {
   100: "Level 100! Produce Prodigy!"
 };
 let milestoneCelebrated = {};
-function celebrateMilestone(level) {
-  if (!MILESTONES[level] || milestoneCelebrated[level]) return;
-  milestoneCelebrated[level] = true;
-  // Toast
-  toast(MILESTONES[level]);
-  // Big confetti animation
-  let cDiv = document.createElement('div');
-  cDiv.className = 'big-confetti';
-  for(let i=0; i<45; i++) {
-    let dot = document.createElement('span');
-    dot.className = 'celebration-dot';
-    const colors = ['#FFD700', '#FF4136', '#2ECC40', '#B10DC9', '#FF851B', '#0074D9'];
-    dot.style.background = colors[Math.floor(Math.random()*colors.length)];
-    dot.style.left = (4 + Math.random()*92) + 'vw';
-    dot.style.top = (-4 + Math.random()*6) + 'vh';
-    dot.style.animationDelay = (Math.random()*0.3)+'s';
-    cDiv.appendChild(dot);
-  }
-  document.body.appendChild(cDiv);
-  setTimeout(()=>cDiv.remove(), 1500);
-}
+    function celebrateMilestone(lvl) {
+        // Celebrate every level-up!
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
 
-    const ACH_LIST=[
-      {key:'tycoon',name:'Fruit Tycoon',check:()=>state.coins>=1000000},
-      {key:'tapstorm',name:'Tap Storm',check:()=>window._tapStormDone},
-      {key:'prestmaniac',name:'Prestige Maniac',check:()=>state.prestigeCount>=10},
-      {key:'megacombo',name:'Mega Combo',check:()=>window._megaComboDone},
-      {key:'goldtouch',name:'Golden Touch',check:()=>window._goldTouchDone},
-      {key:'superfarmer',name:'Super Farmer',check:()=>state.farmhands>=5},
-      {key:'zen',name:'Zen Mode',check:()=>window._zenModeDone},
-      {key:'tap1',name:'First Tap',check:()=>state.totalTaps>=1},
-      {key:'tap100',name:'Tapped 100',check:()=>state.totalTaps>=100},
-      {key:'lvl10',name:'Level 10',check:()=>state.level>=10},
-      {key:'orch1',name:'Bought 1 Orchard',check:()=>state.orchards>=1},
-      {key:'prest',name:'First Prestige',check:()=>state.prestigeCount>=1}
+    
+    
+    const ACH_LIST = [
+      { key: 'tap1',            name: 'First Tap',           check: () => state.totalTaps >= 1 },
+      { key: 'tap100',          name: 'Tapped 100',          check: () => state.totalTaps >= 100 },
+      { key: 'tap500',          name: 'Tap Maniac',          check: () => state.totalTaps >= 500 },
+      { key: 'tap1000',         name: 'Tapzilla',            check: () => state.totalTaps >= 1000 },
+      { key: 'tap5000',         name: 'Tapocalypse Now',     check: () => state.totalTaps >= 5000 },
+      { key: 'tap10000',        name: 'Clickaholic',         check: () => state.totalTaps >= 10000 },
+      { key: 'megacombo',       name: 'Mega Combo',          check: () => window._megaComboDone },
+      { key: 'tapstorm',        name: 'Tap Storm',           check: () => window._tapStormDone },
+      { key: 'goldtouch',       name: 'Golden Touch',        check: () => window._goldTouchDone },
+      { key: 'zen',             name: 'Zen Mode',            check: () => window._zenModeDone },
+      { key: 'lvl10',           name: 'Level 10',            check: () => state.level >= 10 },
+      { key: 'lvl20',           name: 'Fruit Ninja (Lv20)',  check: () => state.level >= 20 },
+      { key: 'lvl50',           name: 'Half Century',        check: () => state.level >= 50 },
+      { key: 'orch1',           name: 'Bought 1 Orchard',    check: () => state.orchards >= 1 },
+      { key: 'orchardBaron',    name: 'Orchard Baron',       check: () => state.orchards >= 3 },
+      { key: 'orchardEmpire',   name: 'Orchard Empire',      check: () => state.orchards >= 10 },
+      { key: 'farmhandHoarder', name: 'Farmhand Hoarder',    check: () => state.farmhands >= 3 },
+      { key: 'farmhandFactory', name: 'Farmhand Factory',    check: () => state.farmhands >= 10 },
+      { key: 'upgradeAddict',   name: 'Upgrade Addict',      check: () => state.clickValue >= 10 },
+      { key: 'upgradeOverload', name: 'Upgrade Overload',    check: () => state.clickValue >= 50 },
+      { key: 'autoGuru',        name: 'Auto-Pilot Guru',     check: () => state.autoPower >= 10 },
+      { key: 'autoOverdrive',   name: 'Auto Overdrive',       check: () => state.autoPower >= 50 },
+      { key: 'prest',           name: 'First Prestige',      check: () => state.prestigeCount >= 1 },
+      { key: 'prestmaniac',     name: 'Prestige Maniac',     check: () => state.prestigeCount >= 10 },
+      { key: 'prestigeGod',     name: 'Prestige God',        check: () => state.prestigeCount >= 50 },
+      { key: 'coinPusher',      name: 'Piggy Bank',          check: () => state.coins >= 10000 },
+      { key: 'tycoon',          name: 'Fruit Tycoon',        check: () => state.coins >= 1000000 },
+      { key: 'billionaire',     name: 'Billionaire',         check: () => state.coins >= 1000000000 }
     ];
+
+
     let leaders=JSON.parse(localStorage.getItem('ftLeaders')||'[]'),
         player=localStorage.getItem('ftPlayer')||(prompt('Enter your name:','Anon')||'Anon');
     localStorage.setItem('ftPlayer',player);
@@ -1074,7 +1210,12 @@ if (changeNameBtn) {
     state.level++;
     state.progress -= th;
     celebrateMilestone(state.level);
-  }
+    fruitBtn.classList.add('big-wiggle');
+    playLevelUpSound();
+    setTimeout(() => fruitBtn.classList.remove('big-wiggle'), 400);
+  
+  showPrestigeShopButton();
+}
   levelEl.textContent = state.level;
   fillEl.style.width = (state.progress / th * 100) + '%';
   prestigeBtn.disabled = state.level < 20;
@@ -1111,6 +1252,16 @@ if (changeNameBtn) {
     
 
 function handleTap(x, y) {
+
+  // Get the slide-wrapper current transform translateX value
+  const slideWrapper = document.querySelector('#fruit-btn .slide-wrapper');
+  let slideX = 0;
+  if (slideWrapper) {
+    const style = window.getComputedStyle(slideWrapper);
+    const matrix = new WebKitCSSMatrix(style.transform);
+    slideX = matrix.m41; // horizontal translateX in px
+  }
+
   // Apple wiggle effect
   fruitBtn.classList.remove('wiggle');
   void fruitBtn.offsetWidth; // Force reflow for repeat animation
@@ -1166,11 +1317,23 @@ function handleTap(x, y) {
   txt.className = 'floating-text';
   txt.textContent = '+' + state.clickValue;
   document.body.appendChild(txt);
-  txt.style.left = (rect.left + rect.width / 2 + randomOffset) + 'px';
+  txt.style.left = (rect.left + rect.width / 2 + randomOffset + slideX) + 'px';
   txt.style.top = (rect.top + 10) + 'px';
   setTimeout(() => txt.remove(), 800);
   updateLevel();
   updateUI();
+
+// Pause/resume music when page visibility changes
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    bg.pause();
+  } else {
+    if (!muted) bg.play();
+  }
+});
+// Also pause on window blur and resume on focus
+window.addEventListener('blur', () => bg.pause());
+window.addEventListener('focus', () => { if (!muted) bg.play(); });
 }
 
 
@@ -1708,10 +1871,8 @@ if (typeof updateUI === "function") {
 }
 
 </script>
-
-
-  <!-- Update Available banner (hidden by default) -->
-  <div id="update-banner" style="
+<!-- Update Available banner (hidden by default) -->
+<div id="update-banner" style="
       display: none;
       position: fixed;
       bottom: 0;
@@ -1726,8 +1887,7 @@ if (typeof updateUI === "function") {
     ">
     🔄 New version available – click to update!
   </div>
-
-  <script>
+<script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').then(reg => {
         // Show banner if there's an updated SW waiting
@@ -2237,15 +2397,13 @@ if (typeof updateUI === "function") {
 }
 
 </script>
-
-  <div id="facts-modal-bg">
-    <div id="facts-modal">
-      <button class="close-btn" id="close-facts">&times;</button>
-      <h2>🍉 Fruit Facts Unlocked</h2>
-      <ul id="facts-list"></ul>
-    </div>
-  </div>
-
+<div id="facts-modal-bg">
+<div id="facts-modal">
+<button class="close-btn" id="close-facts">×</button>
+<h2>🍉 Fruit Facts Unlocked</h2>
+<ul id="facts-list"></ul>
+</div>
+</div>
 <canvas id="particle-canvas"></canvas>
 <script>
 // Particle burst effect
@@ -2290,6 +2448,21 @@ function updateParticles() {
 updateParticles();
 
 const fruitBtn = document.getElementById('tap-zone');
+
+    // Play a brief level-up sound using Web Audio API
+    function playLevelUpSound() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = 440;
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+    }
+
 fruitBtn.addEventListener('click', (e) => {
   const rect = fruitBtn.getBoundingClientRect();
   createParticles(
@@ -2298,7 +2471,6 @@ fruitBtn.addEventListener('click', (e) => {
   );
 });
 </script>
-
 <script>
 // Add glow effect on upgrade buttons
 const upgradeButtons = document.querySelectorAll('button[data-req-level]');
@@ -2311,7 +2483,6 @@ upgradeButtons.forEach(btn => {
   });
 });
 </script>
-
 <script>
 // Enhance upgrade buttons with scale effect and particle burst
 const upgradeButtons = document.querySelectorAll('button[data-req-level]');
@@ -2331,7 +2502,6 @@ upgradeButtons.forEach(btn => {
   });
 });
 </script>
-
 <script>
 // Play upgrade sound
 function playUpgradeSound() {
@@ -2398,7 +2568,6 @@ upgradeButtons.forEach(btn => {
   });
 });
 </script>
-
 <script>
 // Create toast notification
 function createToast(msg) {
@@ -2429,7 +2598,6 @@ upgradeButtons.forEach(btn => {
   });
 });
 </script>
-
 <script>
 (() => {
   const ids = ['upgrade-btn','auto-btn','tree-btn','orchard-btn','farmhand-btn'];
@@ -2480,16 +2648,14 @@ upgradeButtons.forEach(btn => {
   });
 })();
 </script>
-
 <!-- Tutorial Overlay -->
 <div id="tutorial-overlay">
-  <div id="tutorial-popup">
-    <p id="tutorial-message"></p>
-    <button id="tutorial-next">Next</button>
-    <button id="tutorial-skip">Skip</button>
-  </div>
+<div id="tutorial-popup">
+<p id="tutorial-message"></p>
+<button id="tutorial-next">Next</button>
+<button id="tutorial-skip">Skip</button>
 </div>
-
+</div>
 <script>
 // Guided tutorial steps
 (function(){
@@ -2543,7 +2709,6 @@ upgradeButtons.forEach(btn => {
   });
 })();
 </script>
-
 <script>
 // Ensure Prestige Shop button toggles the details panel
 document.addEventListener('DOMContentLoaded', () => {
@@ -2561,7 +2726,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
-
 <script>
 // Override showPrestigeShopButton to always show the button
 function showPrestigeShopButton() {
@@ -2586,7 +2750,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
 <script>
 // Bind the single Prestige Shop button inside #prestige-container to the shop modal
 document.addEventListener('DOMContentLoaded', () => {
@@ -2596,8 +2759,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
-
-
 <!-- Override renderPrestigeShop to ensure all upgrades display -->
 <script>
 (function(){
@@ -2624,7 +2785,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 })();
 </script>
-
 <!-- Consolidated Prestige Shop Logic Override -->
 <script>
 (function(){
@@ -2717,8 +2877,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('prestige-shop-btn').addEventListener('click', openPrestigeShop);
 })();
 </script>
-
-
 <!-- Leaderboard Fix: use state.totalTaps -->
 <script>
 function renderLeaderboardFixed() {
@@ -2747,7 +2905,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
-
 <script>
 // Themes & Skins shop logic
 function updateThemeButtons() {
@@ -2798,7 +2955,6 @@ function updateThemeButtons() {
   if (theme) document.body.classList.add(theme.cls);
 });
 </script>
-
 <script>
 // Theme tab show/hide
 document.addEventListener('DOMContentLoaded', () => {
@@ -2817,8 +2973,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
-
-
 <!-- Updated Themes & Skins shop logic with gating and reset -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -2885,8 +3039,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateThemeButtons();
 });
 </script>
-
-
 <div id="daily-toast"></div>
 <script>
 // Enhanced Daily Login Rewards: Welcome back toast +7-day streak bonuses
@@ -2917,12 +3069,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 </script>
-
-
 <div id="idle-overlay"></div>
 <div id="idle-modal">
-  <p id="idle-modal-msg"></p>
-  <button class="close-idle">Close</button>
+<p id="idle-modal-msg"></p>
+<button class="close-idle">Close</button>
 </div>
 <script>
 // Offline Earnings Modal: 5% of CPS per hour away
@@ -2954,8 +3104,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
-
-
 <!-- Hall of Fame Extension -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -2981,8 +3129,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-
-
 <!-- In-Game Notifications -->
 <script>
 // Request Notification permission and schedule a reminder if away >1h
@@ -3013,8 +3159,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
-
-
 <!-- Animated Counters -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -3063,8 +3207,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 </script>
-
-
 <script>
 // Add transition class to tab containers
 document.addEventListener('DOMContentLoaded', () => {
@@ -3078,7 +3220,407 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+<script>
+function showPrestigeShopButton() {
+  const prestigeBtn = document.getElementById('prestige-btn');
+  if (state.level >= 20) {
+    prestigeBtn.disabled = false;
+    prestigeBtn.classList.add('pulse');
+  } else {
+    prestigeBtn.disabled = true;
+    prestigeBtn.classList.remove('pulse');
+    prestigeBtn.classList.remove('shake');
+  }
+}
+
+function periodicShake() {
+  const btn = document.getElementById('prestige-btn');
+  if (btn.classList.contains('pulse')) {
+    btn.classList.add('shake');
+    setTimeout(() => btn.classList.remove('shake'), 500);
+  }
+}
+setInterval(periodicShake, 5000);
+
+// Call it once on load (after your initial updateUI)
+showPrestigeShopButton();
+</script>
+<script>
+// JS horizontal slide for .slide-wrapper
+(() => {
+  const slideWrapper = document.querySelector('#fruit-btn .slide-wrapper');
+  if (!slideWrapper) return;
+  const maxTranslateX = 130; // px, max horizontal slide distance
+  const speed = 100; // px per second, adjust speed
+
+  let direction = 1; // 1 = moving right, -1 = moving left
+  let position = 0; // current position
+  let lastTimestamp = null;
+
+  function slide(timestamp) {
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    const delta = (timestamp - lastTimestamp) / 1000;
+    lastTimestamp = timestamp;
+
+    position += direction * speed * delta;
+    if (position > maxTranslateX) {
+      position = maxTranslateX;
+      direction = -1;
+    } else if (position < -maxTranslateX) {
+      position = -maxTranslateX;
+      direction = 1;
+    }
+
+    slideWrapper.style.transform = `translateX(${position}px)`;
+    requestAnimationFrame(slide);
+  }
+
+  requestAnimationFrame(slide);
+})();
+
+// --- THEME SHOP PRESTIGE POINTS PURCHASE & OWNERSHIP FIX ---
+
+// Initialize owned themes, include 'default' by default
+if (!state.ownedThemes) {
+  state.ownedThemes = ['default'];
+}
+
+// Initialize prestige points (using existing prestigeCount)
+state.prestigePoints = state.prestigeCount || 0;
+
+const themeButtons = document.querySelectorAll('#theme-shop .theme-btn');
+
+function applyTheme(theme) {
+  document.body.classList.remove('dark-mode', 'neon-mode', 'forest-mode', 'sunset-mode');
+  if (theme && theme !== 'default') {
+    document.body.classList.add(theme + '-mode');
+  }
+  state.currentTheme = theme || 'default';
+  save();
+}
+
+// Load saved theme on startup
+if (state.currentTheme) {
+  applyTheme(state.currentTheme);
+}
+
+// Update theme shop button states based on points and ownership
+function updateThemeButtons() {
+  themeButtons.forEach(btn => {
+    const cost = parseInt(btn.dataset.cost, 10) || 0;
+    const theme = btn.dataset.theme;
+    const owned = state.ownedThemes.includes(theme);
+
+    // Reset button text to base name (remove previous unlock or cost)
+    let baseText = btn.textContent.replace(/ \(Cost: \d+\)/, '').replace(/ \(Unlocked\)/, '').trim();
+
+    if (owned || cost === 0) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = owned ? baseText + ' (Unlocked)' : baseText;
+    } else {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.textContent = baseText + ` (Cost: ${cost})`;
+    }
+  });
+}
+
+// Theme button click handler
+themeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cost = parseInt(btn.dataset.cost, 10) || 0;
+    const theme = btn.dataset.theme;
+    const owned = state.ownedThemes.includes(theme);
+
+    if (!owned && cost > state.prestigePoints) {
+      toast('Not enough Prestige Points!');
+      return;
+    }
+    if (state.currentTheme === theme) {
+      toast('Theme already active!');
+      return;
+    }
+
+    if (!owned && cost > 0) {
+      state.prestigePoints -= cost;
+      state.ownedThemes.push(theme);
+      toast(`Purchased ${theme} theme for ${cost} Prestige Points!`);
+    } else if (cost === 0) {
+      toast('Switched to Normal Mode (Free)');
+    } else {
+      toast(`Switched to ${theme} theme`);
+    }
+
+    applyTheme(theme);
+    updateThemeButtons();
+    updateUI(); // update UI for prestige points display if needed
+  });
+});
+
+// Modify updateUI to update prestige points display and theme buttons
+const originalUpdateUI = updateUI;
+updateUI = function() {
+  originalUpdateUI();
+  prestigeCountEl.textContent = state.prestigePoints;
+  updateThemeButtons();
+};
+updateUI();
+
+</script>
+<script>
+// PWA Enhancements
+
+// 1. Notification Permission & Push Subscription
+if ('Notification' in window) {
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') subscribeToPush();
+  });
+}
+async function subscribeToPush() {
+  const reg = await navigator.serviceWorker.ready;
+  const vapidKey = 'YOUR_PUBLIC_VAPID_KEY';
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(vapidKey)
+  });
+  console.log('Push subscription:', sub);
+}
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const str = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = window.atob(str);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+// 2. Install Prompt
+let installPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPrompt = e;
+  document.getElementById('install-btn').style.display = 'block';
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  installPrompt.prompt();
+  installPrompt = null;
+  document.getElementById('install-btn').style.display = 'none';
+});
+
+// 3. Background Sync Registration
+if ('serviceWorker' in navigator && 'SyncManager' in window) {
+  navigator.serviceWorker.ready.then(reg => reg.sync.register('idle-earnings'));
+}
+
+// 4. Handle Idle Earnings Messages
+navigator.serviceWorker.addEventListener('message', evt => {
+  if (evt.data?.type === 'IDLE_EARN') {
+    const maxOfflineCoins = 10000;  // cap offline coins to 10k
+    const earned = Math.min(evt.data.amount, maxOfflineCoins);
+    state.coins += earned;
+    updateUI();
+    toast(`Welcome back! You earned ${earned} coins while away.`);
+  }
+});
+</script>
+
+
+<script>
+// Idle-away bonus + toast on return
+
+window.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    localStorage.setItem('ft_lastHidden', Date.now());
+  }
+});
+
+window.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    const lastHidden = parseInt(localStorage.getItem('ft_lastHidden'), 10) || Date.now();
+    const now = Date.now();
+    const awayMs = now - lastHidden;
+    const bonusMs = Math.min(awayMs, 60 * 60 * 1000);
+    const bonusCoins = Math.floor(gameState.cps * 0.05 * (bonusMs / 1000));
+
+    gameState.coins += bonusCoins;
+    updateUI();
+
+    showToast(`Welcome back! You earned ${bonusCoins} coins while away.`);
+
+    localStorage.removeItem('ft_lastHidden');
+  }
+});
+</script>
+
+
+<script>
+// Progressive Onboarding Tooltips
+
+function showTooltipOnce(key, targetSelector, content, duration = 5000) {
+  if (localStorage.getItem(key)) return;
+  const el = document.querySelector(targetSelector);
+  if (!el) return;
+  const tip = tippy(el, {
+    content,
+    trigger: 'manual',
+    placement: 'top',
+    onShow(instance) {
+      setTimeout(() => instance.destroy(), duration);
+    }
+  });
+  tip[0].show();
+  localStorage.setItem(key, '1');
+}
+
+// Hook into game logic update loop or after specific events:
+
+// Example: first time Prestige is unlocked
+if (typeof gameState !== 'undefined' && gameState.level >= 20) {
+  showTooltipOnce(
+    'seenPrestigeTip',
+    '#prestige-btn',
+    'Congrats—Prestige is unlocked! Click here to reset for permanent bonuses.'
+  );
+}
+
+// Example: first Golden Fruit appearance
+if (typeof gameState !== 'undefined' && gameState.goldenFruitCount > 0) {
+  showTooltipOnce(
+    'seenGoldenTip',
+    '#golden-fruit-img',
+    'You caught a Golden Fruit! Tap it fast for huge coin boosts.'
+  );
+}
+</script>
+
+<div id="daily-toast"></div>
+<!-- DAILY_TOAST_HTML -->
+
+<script>
+// Offline earnings and daily rewards
+function showDailyToast(msg) {
+  const el = document.getElementById('daily-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function handleOfflineEarnings() {
+  const lastTs = parseInt(localStorage.getItem('lastTimestamp') || Date.now());
+  const now = Date.now();
+  const diffSec = Math.floor((now - lastTs) / 1000);
+  const idleRate = state.autoPower || 0; // coins per second
+  if (diffSec > 10 && idleRate > 0) {
+    const earnings = idleRate * diffSec;
+    state.coins += earnings;
+    showDailyToast(`You earned ${earnings} 🟡 while offline!`);
+    renderCurrency(); // update UI
+  }
+  localStorage.setItem('lastTimestamp', now);
+}
+
+window.addEventListener('load', () => {
+  handleOfflineEarnings();
+  handleDailyReward();
+});
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('lastTimestamp', Date.now());
+});
+
+function handleDailyReward() {
+  const today = new Date().toISOString().slice(0,10);
+  const lastDaily = localStorage.getItem('lastDailyDate');
+  const reward = 100; // daily reward amount
+  if (lastDaily !== today) {
+    state.coins += reward;
+    showDailyToast(`Daily reward: You received ${reward} 🟡!`);
+    renderCurrency();
+    localStorage.setItem('lastDailyDate', today);
+  }
+}
+</script>
+
+<!-- DAILY_REWARDS_JS -->
+
+
+<script>
+// Ensure DOM is loaded before attaching handlers
+document.addEventListener('DOMContentLoaded', () => {
+  const lbBtn = document.getElementById('leaderboard-button');
+  const shareBtn = document.getElementById('share-button');
+  const leadersList = document.getElementById('leaders');
+
+  if (lbBtn && leadersList) {
+    lbBtn.addEventListener('click', async () => {
+      leadersList.innerHTML = '<li>Loading...</li>';
+      try {
+        const resp = await fetch('https://example.com/api/leaderboard');
+        const data = await resp.json();
+        leadersList.innerHTML = '';
+        data.forEach(entry => {
+          const li = document.createElement('li');
+          li.textContent = `${entry.name}: ${entry.score}`;
+          leadersList.appendChild(li);
+        });
+      } catch (e) {
+        leadersList.innerHTML = '<li>Error loading leaderboard</li>';
+      }
+    });
+  }
+
+  if (shareBtn) {
+    
+  
+  shareBtn.addEventListener('click', () => {
+    const text = `I just scored ${state.coins} coins in Fruit Tapper! Can you beat my score?`;
+    const url = 'https://vietnamvet.github.io/Fruit-Tapper/';
+    if (navigator.share) {
+      navigator.share({ title: 'My Fruit Tapper Score', text, url });
+    } else {
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+      window.open(tweetUrl, '_blank');
+    }
+  });
+
+    } else {
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+      window.open(tweetUrl, '_blank');
+    }
+  });
+
+      } else {
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+          '_blank'
+        );
+      }
+    });
+  }
+});
+</script>
+
+
+<script>
+// Attach share handler after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  const shareBtn = document.getElementById('share-button');
+  if (!shareBtn) {
+    console.warn('Share button not found');
+    return;
+  }
+  shareBtn.addEventListener('click', () => {
+    const text = `I just scored ${state.coins} coins in Fruit Tapper! Can you beat my score?`;
+    const url = 'https://vietnamvet.github.io/Fruit-Tapper/';
+    if (navigator.share) {
+      navigator.share({ title: 'My Fruit Tapper Score', text, url });
+    } else {
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+      window.open(tweetUrl, '_blank');
+    }
+  });
+});
+</script>
 
 </body>
-
 </html>
