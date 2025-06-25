@@ -1,52 +1,53 @@
-const CACHE_NAME = 'fruit-tapper-cache-v1';
-const PRECACHE_URLS = [
-  './',
-  './index.html',
-  './offline.html',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
-];
+importScripts('https://unpkg.com/idb-keyval@6/dist/idb-keyval-iife.min.js');
+// Background Sync integration
+const QUEUE_STORE = 'outbox';
 
-// Install & precache
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_URLS)));
-});
-
-// Activate
-self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
-});
-
-// Fetch with offline fallback
+// 1. Intercept and queue failed POSTs
 self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate') {
+  const req = event.request;
+  if (req.method === 'POST' && req.url.includes('/api/')) {
     event.respondWith(
-      caches.match(event.request).then(resp => resp || fetch(event.request).catch(() => caches.match('offline.html')))
+      fetch(req.clone()).catch(() => {
+        return req.clone().json().then(body => {
+          return idbKeyval.get(QUEUE_STORE).then(queue => {
+            queue = queue || [];
+            queue.push({ url: req.url, body, headers: [...req.headers] });
+            return idbKeyval.set(QUEUE_STORE, queue);
+          });
+        }).then(() => {
+          return self.registration.sync.register('sync-outbox');
+        }).then(() => {
+          return new Response(JSON.stringify({ success: false, offline: true }), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+        });
+      })
     );
-  } else {
-    event.respondWith(caches.match(event.request).then(resp => resp || fetch(event.request)));
   }
 });
 
-// Background Sync handler
+// 2. On sync, replay everything in the queue
 self.addEventListener('sync', event => {
-  if (event.tag === 'sync-content') {
-    event.waitUntil(Promise.resolve());
+  if (event.tag === 'sync-outbox') {
+    event.waitUntil(
+      idbKeyval.get(QUEUE_STORE).then(queue => {
+        if (!queue || !queue.length) return;
+        return queue.reduce((chain, entry) => {
+          return chain.then(() => {
+            return fetch(entry.url, {
+              method: 'POST',
+              headers: new Headers(entry.headers),
+              body: JSON.stringify(entry.body)
+            }).then(res => {
+              if (!res.ok) throw new Error('Server error');
+              return idbKeyval.get(QUEUE_STORE).then(q => {
+                q.shift();
+                return idbKeyval.set(QUEUE_STORE, q);
+              });
+            });
+          });
+        }, Promise.resolve());
+      })
+    );
   }
-});
-
-// Periodic Sync handler
-self.addEventListener('periodicsync', event => {
-  if (event.tag === 'update-content') {
-    event.waitUntil(Promise.resolve());
-  }
-});
-
-// Push Notification handler
-self.addEventListener('push', event => {
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || 'Fruit Tapper';
-  const options = { body: data.body || 'Check out new features!', icon: 'icons/icon-192.png' };
-  event.waitUntil(self.registration.showNotification(title, options));
 });
