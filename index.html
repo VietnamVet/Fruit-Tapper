@@ -3642,39 +3642,37 @@ if ('serviceWorker' in navigator) {
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').then(async reg => {
-    console.log('SW registered:', reg);
-    // Periodic Sync
-    if ('periodicSync' in reg) {
-      try {
-        await reg.periodicSync.register('refresh-content', { minInterval: 24 * 60 * 60 * 1000 });
-      } catch (err) {
-        console.warn('Periodic Sync failed', err);
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(reg => {
+      // Background Sync registration
+      if ('sync' in reg) {
+        reg.sync.register('sync-posts');
       }
-    }
-  });
-
-  navigator.serviceWorker.ready.then(reg => {
-    // Push subscription
-    if ('PushManager' in window) {
-      const VAPID_PUBLIC_KEY = '<YOUR_VAPID_PUBLIC_KEY_HERE>';
-      function urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+      // Periodic Sync registration
+      if ('periodicSync' in reg) {
+        reg.periodicSync.register('refresh-content', {minInterval: 24 * 60 * 60 * 1000});
       }
-      reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-      }).then(sub => {
-        fetch('/api/save-subscription', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify(sub)
+      // Push subscription
+      if ('PushManager' in window) {
+        const vapidKey = '<YOUR_VAPID_PUBLIC_KEY>';
+        function urlBase64ToUint8Array(base64String) {
+          const padding = '='.repeat((4 - base64String.length % 4) % 4);
+          const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+          const rawData = window.atob(base64);
+          return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+        }
+        reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey)
+        }).then(sub => {
+          fetch('/api/save-subscription', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(sub)
+          });
         });
-      });
-    }
+      }
+    });
   });
 }
 </script>
