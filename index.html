@@ -834,7 +834,7 @@ closeLb.addEventListener('click', () => leaderboardModal.style.display = 'none')
 // Social sharing
 const shareButton = document.getElementById('share-button');
 shareButton.addEventListener('click', () => {
-  const text = `I just scored ${state.coins} coins in Fruit Tapper! Can you beat my score?`;
+  const text = `I just scored ${formatCoins(state.coins)} in Fruit Tapper! Can you beat my score?`;
   const url = window.location.href;
   if (navigator.share) {
     navigator.share({ title: 'My Fruit Tapper Score', text, url });
@@ -879,6 +879,15 @@ shareButton.addEventListener('click', () => {
   animation: fadeInOut 4s ease-out forwards !important;
 }
 </style>
+
+<script>
+function formatCoins(n) {
+  if (n >= 1e9)   return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'b';
+  if (n >= 1e6)   return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'm';
+  if (n >= 1e3)   return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
+  return n.toString();
+}
+</script>
 </head>
 <body>
   <button id="install-btn" style="display:none;position:fixed;bottom:1rem;right:1rem;z-index:1000;">Install Fruit Tapper</button>
@@ -1269,7 +1278,7 @@ if (changeNameBtn) {
     if (state.coins >= u.price) el.classList.add('pulse');
     else el.classList.remove('pulse');
   });
- coinsEl.textContent=state.coins; clickValueEl.textContent=state.clickValue; autoPowerEl.textContent=state.autoPower; prestigeCountEl.textContent=state.prestigeCount; ['upgrade','auto','tree','orchard','farmhand'].forEach(id=>document.getElementById(id+'-cost').textContent=state[id+'Cost']); btns.forEach(b=>{ let req=+b.dataset.reqLevel, cost=state[b.id.replace('-btn','')+'Cost']; b.disabled=state.level<req||state.coins<cost; }); updateAchievements(); save(); updateLeaders();
+ coinsEl.textContent = formatCoins(state.coins); clickValueEl.textContent = formatCoins(state.clickValue); autoPowerEl.textContent=state.autoPower; prestigeCountEl.textContent = formatCoins(state.prestigeCount); ['upgrade','auto','tree','orchard','farmhand'].forEach(id=>document.getElementById(id+'-cost').textContent=state[id+'Cost']); btns.forEach(b=>{ let req=+b.dataset.reqLevel, cost=state[b.id.replace('-btn','')+'Cost']; b.disabled=state.level<req||state.coins<cost; }); updateAchievements(); save(); updateLeaders();
     showPrestigeShopButton(); }
 
     document.getElementById('mute-btn').onclick=()=>{
@@ -1470,7 +1479,7 @@ function updateCPS() {
   let coinsNow = state.coins;
   let cps = (coinsNow - lastCoins) / ((now - lastUpdate) / 1000);
   if (cps < 0) cps = 0;
-  document.getElementById("cps").textContent = "Coins/sec: " + cps.toFixed(1);
+  document.getElementById("cps").textContent = "Coins/sec: " + formatCoins(parseFloat(cps.toFixed(1)));
   lastCoins = coinsNow;
   lastUpdate = now;
 }
@@ -1996,7 +2005,7 @@ function updateCPS() {
   let coinsNow = state.coins;
   let cps = (coinsNow - lastCoins) / ((now - lastUpdate) / 1000);
   if (cps < 0) cps = 0;
-  document.getElementById("cps").textContent = "Coins/sec: " + cps.toFixed(1);
+  document.getElementById("cps").textContent = "Coins/sec: " + formatCoins(parseFloat(cps.toFixed(1)));
   lastCoins = coinsNow;
   lastUpdate = now;
 }
@@ -3196,7 +3205,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- Animated Counters -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  function animateValue(el, start, end, duration = 600) {
+  
+function animateValue(el, start, end, duration = 600) {
     const range = end - start;
     const minInterval = 50;
     const steps = Math.max(Math.floor(duration / minInterval), 1);
@@ -3204,21 +3214,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepTime = duration / steps;
     const timer = setInterval(() => {
       currentStep++;
-      const value = start + (range * (currentStep / steps));
-      if (el.id === 'coins' || el.id === 'prestige-count') {
-        el.textContent = Math.floor(value);
-      } else {
-        el.textContent = value.toFixed(1);
-      }
+      const raw = start + (range * (currentStep / steps));
+      const v = (el.id === 'coins' || el.id === 'prestige-count')
+        ? Math.floor(raw)
+        : parseFloat(raw.toFixed(1));
+      el.textContent = formatCoins(v);
       if (currentStep >= steps) {
         clearInterval(timer);
-        // ensure final accuracy
-        if (el.id === 'coins' || el.id === 'prestige-count') {
-          el.textContent = end;
-        } else {
-          el.textContent = end.toFixed(1);
-        }
+        const finalV = (el.id === 'coins' || el.id === 'prestige-count')
+          ? end
+          : parseFloat(end.toFixed(1));
+        el.textContent = formatCoins(finalV);
       }
+    }, stepTime);
+}
+
     }, stepTime);
   }
 
@@ -3452,7 +3462,7 @@ navigator.serviceWorker.addEventListener('message', evt => {
     const earned = Math.min(evt.data.amount, maxOfflineCoins);
     state.coins += earned;
     updateUI();
-    toast(`Welcome back! You earned ${earned} coins while away.`);
+    toast(`Welcome back! You earned ${formatCoins(earned)} while away.`);
   }
 });
 </script>
@@ -3478,7 +3488,7 @@ window.addEventListener('visibilitychange', () => {
     gameState.coins += bonusCoins;
     updateUI();
 
-    showToast(`Welcome back! You earned ${bonusCoins} coins while away.`);
+    showToast(`Welcome back! You earned ${formatCoins(bonusCoins)} while away.`);
 
     localStorage.removeItem('ft_lastHidden');
   }
@@ -3607,7 +3617,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
   
   shareBtn.addEventListener('click', () => {
-    const text = `I just scored ${state.coins} coins in Fruit Tapper! Can you beat my score?`;
+    const text = `I just scored ${formatCoins(state.coins)} in Fruit Tapper! Can you beat my score?`;
     const url = 'https://vietnamvet.github.io/Fruit-Tapper/';
     if (navigator.share) {
       navigator.share({ title: 'My Fruit Tapper Score', text, url });
@@ -3644,7 +3654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
   shareBtn.addEventListener('click', () => {
-    const text = `I just scored ${state.coins} coins in Fruit Tapper! Can you beat my score?`;
+    const text = `I just scored ${formatCoins(state.coins)} in Fruit Tapper! Can you beat my score?`;
     const url = 'https://vietnamvet.github.io/Fruit-Tapper/';
     if (navigator.share) {
       navigator.share({ title: 'My Fruit Tapper Score', text, url });
